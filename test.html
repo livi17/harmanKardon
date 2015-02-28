@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<style>/* Some style */
+	.inline {
+		display: inline-block;
+	}
+
+	#dials {
+		height: 320px;
+		overflow: hidden;
+	}
+
+	.dial {
+		display: block;
+		position: relative;
+		height: 320px;
+	}
+
+	.dial.hidden {
+		display: none;
+	}
+
+	#jog_dial_one {
+		position: relative;
+		width: 50px;
+		height: 50px;
+		margin: 20px auto;
+		background: url('/img/base_one_bg.png');
+		background-repeat: none;
+	}
+	#jog_dial_one #jog_dial_one_knob {
+		background: url('/img/base_one_knob.png');
+	}
+
+	#jog_dial_one_meter {
+		width: 200px;
+		height: 10px;
+		margin: 20px auto 30px;
+		background: #999;
+		overflow: hidden;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		-ms-border-radius: 5px;
+		-o-border-radius: 5px;
+		border-radius: 5px;
+	}
+	#jog_dial_one_meter div {
+		position: relative;
+		width: 0;
+		height: 100%;
+		background: #80e93a;
+	}
+
+
+.knob{
+	color: white;
+	text-align: center;
+	line-height: 100px;
+	/*Rounded Corners and Shadows*/
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
+	border-radius: 100px;
+	-webkit-box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+	-moz-box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+	box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+	background: #9F9070; /* Old browsers */
+}
+#bass-knob{
+	position: relative;
+	height:34px;
+	width: 34px;
+	float: right;
+	right:15px;
+
+}
+.knob:before{
+	content:"";
+	width: 100%;
+	height: 100%;
+	display: block;
+	z-index: -1;
+	position: relative;
+	padding: 3px;
+	background: #756D5A;
+	left: -3px;
+	top: -3px;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
+	border-radius: 100px;
+	-webkit-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	-moz-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	
+	
+}
+.knob:after {
+	content:"";
+	width: 100%;
+	height: 100%;
+	display: block;
+	z-index: -2;
+	position: relative;
+	padding: 5px;
+	background: #866949;
+	position: absolute;
+	left: -5px;
+	top: -5px;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
+	border-radius: 100px;
+	-webkit-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	-moz-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+	
+
+}
+#bass-treble-knobs{
+	position: relative;
+	top:70px;
+	width:100%;
+	border: 1px solid #FF0000;
+	height:50px;
+}
+
+#bass-knob_knob{
+	background: url('img/base_one_knob.png');
+}
+
+
+	</style>
+</head>
+<body>
+
+	<div id="bass-treble-knobs">
+			<div id="bass-knob" class="knob"></div>
+
+
+	</div>
+
+
+
+
+	<script src="js/jogDial.js"></script>
+
+
+	<script>
+	var dialOne = JogDial(document.getElementById('bass-knob'), 
+	{
+		debug: false, 
+		wheelSize: '90%', 
+		zIndex: '100', 
+		touchMode: 'wheel',
+		knobSize: '10%',
+		degreeStartAt: '230',
+		minDegree: 0
+	});
+
+	</script>
+</body>
+</html>
