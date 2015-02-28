@@ -153,39 +153,90 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var randomnumber=Math.ceil(Math.random()*numOfFMStations-1);
     console.log("randomnumber: "+randomnumber);
     console.log("fmSelected.length: "+fmSelected.length);
-    
+
     /*------ pick 8 random preselected stations for am and fm on first power up ---- */
-        while(fmSelected.length < 8){
-             var randomnumber=Math.ceil(Math.random()*numOfFMStations-1);
-            found=false;
-            for(var i=0;i<fmSelected.length;i++){
-                if(fmSelected[i]==randomnumber){
-                    found=true;
-                    break;
-                }
+    while(fmSelected.length < 8){
+         var randomnumber=Math.ceil(Math.random()*numOfFMStations-1);
+        found=false;
+        for(var i=0;i<fmSelected.length;i++){
+            if(fmSelected[i]==randomnumber){
+                found=true;
+                break;
             }
-            if(!found)fmSelected[fmSelected.length]=randomnumber;
         }
-        currFMURL = fmURLs[fmSelected[0]];
-        console.log("currFMURL: "+ currFMURL);
+        if(!found)fmSelected[fmSelected.length]=randomnumber;
+    }
+    currFMURL = fmURLs[fmSelected[0]];
+    console.log("currFMURL: "+ currFMURL);
 
-        while(amSelected.length < 8){
-             var randomnumber=Math.ceil(Math.random()*numOfAMStations-1);
-            found=false;
-            for(var i=0;i<amSelected.length;i++){
-                if(amSelected[i]==randomnumber){
-                    found=true;
-                    break;
-                }
+    while(amSelected.length < 8){
+         var randomnumber=Math.ceil(Math.random()*numOfAMStations-1);
+        found=false;
+        for(var i=0;i<amSelected.length;i++){
+            if(amSelected[i]==randomnumber){
+                found=true;
+                break;
             }
-            if(!found)amSelected[amSelected.length]=randomnumber;
         }
-        currAMURL = amURLs[amSelected[0]];
-        console.log("currAMURL: "+ currAMURL);
+        if(!found)amSelected[amSelected.length]=randomnumber;
+    }
+    currAMURL = amURLs[amSelected[0]];
+    console.log("currAMURL: "+ currAMURL);
 
-        console.log("fmSelected: "+ fmSelected +"\namSelected: "+ amSelected);
+    console.log("fmSelected: "+ fmSelected +"\namSelected: "+ amSelected);
 
   })(); // end of init();
+
+  function radioSwitch(a){
+        //console.log("typeof a: "+typeof a);
+        console.log("radioSwitch(a): "+ a);
+        for(i = 1; i < 9; i++){
+          var shutOff = document.getElementById("preset"+i);
+          shutOff.className  = "glass-button-off";
+        }
+        switch (a) {
+            case 0:
+            document.getElementById("preset1").className  = "glass-button-on";
+            break; 
+            case 1:
+            document.getElementById("preset2").className  = "glass-button-on";
+            break; 
+            case 2:
+            document.getElementById("preset3").className  = "glass-button-on";
+            break; 
+            case 3:
+            document.getElementById("preset4").className  = "glass-button-on";
+            break; 
+            case 4:
+            document.getElementById("preset5").className  = "glass-button-on";
+            break; 
+            case 5:
+            document.getElementById("preset6").className  = "glass-button-on";
+            break; 
+            case 6:
+            document.getElementById("preset7").className  = "glass-button-on";
+            break; 
+            case 7:
+            document.getElementById("preset8").className  = "glass-button-on";
+            break; 
+        }
+    }
+
+    function presetFunctionality(e){
+        console.log("e: "+e.currentTarget.id);
+        var string = e.currentTarget.id;
+        var num = parseInt(string.substr((string.length-1), 1));
+        radioSwitch(num-1);    
+    }
+
+    for(i = 1; i < 9; i++){
+      var presetEl = document.getElementById("preset"+i);
+      //funcEl.addEventListener("click", functions(event)); 
+      presetEl.addEventListener("click", function(event){
+        presetFunctionality(event);
+      }, false);   
+    } //end of for loop
+
 
   function signalLightsOff(){
     console.log("no signal tuned or power off");
