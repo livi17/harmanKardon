@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var fmSelected=[]; // the 8 selected presets... randomized on load
   
   var currFMPreset; // the current selected preset
-  var currFMCallNum; // the current am call stayion number
-  var currFMURL; // the current am url
+  var currFMCallNum; // the current fm call stayion number
+  var currFMURL; // the current fm url
 
 
   var audio  = document.getElementById('audio');
@@ -187,13 +187,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   })(); // end of init();
 
-  function radioSwitch(a){
+  function radioPresetSwitch(a){
         //console.log("typeof a: "+typeof a);
         console.log("radioSwitch(a): "+ a);
         for(i = 1; i < 9; i++){
           var shutOff = document.getElementById("preset"+i);
           shutOff.className  = "glass-button-off";
         }
+
+        if(power === true && tapeMonitor[2] === true){
+                      digitsOn();
+                      audioPlay(amUrl);
+                      signalLightsOff();
+                      signalLightsOn();
+        }
+
         switch (a) {
             case 0:
             document.getElementById("preset1").className  = "glass-button-on";
@@ -226,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         console.log("e: "+e.currentTarget.id);
         var string = e.currentTarget.id;
         var num = parseInt(string.substr((string.length-1), 1));
-        radioSwitch(num-1);    
+        radioPresetSwitch(num-1);    
     }
 
     for(i = 1; i < 9; i++){
