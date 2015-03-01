@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       signalLightsOn();
         }
         function presetPlay(){
-          console.log("fm: " + fm + " am: "+am)
+          console.log("fm: " + fm + " am: "+am);
           if(functions[2] === true){
               currAMPreset = parseInt(a);
               console.log("currAMPreset: "+ currAMPreset);
@@ -333,9 +333,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   function radioDisplay(callNum, signal){
     
-    console.log("callNum: "+ callNum);
-  	currCallNum  = callNum.split('.').join("");
-  	//console.log("currCallNum: "+ currCallNum);
+    console.log("callNum: "+ typeof callNum);
+
+  	if(functions[3] === true){
+      currCallNum  = callNum.split('.').join("");
+    } else if(functions[2] === true){
+      currCallNum = String(callNum);
+    }
+    console.log("currCallNum: "+ currCallNum);
+  	console.log("currCallNum.length: "+ currCallNum.length);
 
   	if(currCallNum.length==4){
       num4 = currCallNum.substr(3,1);
@@ -634,6 +640,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }, false);
 
 
+/*--- up tuner button functionality --*/
   var tunerUp = document.getElementById("up-button"); 
   tunerUp.addEventListener("click", function(event){
       console.log("tuner up");
@@ -642,15 +649,52 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // auto tuner
         console.log("autoTuner");
       } else {
+        console.log("Manual Tuner");
         // manual tuner selected
         if(functions[2] === true){
+          console.log("its in AM mode");
           //its in AM mode
           if(currAMCallNum !== undefined){
+            console.log("a preset HAS been selected");
             console.log("currAMCallNum: "+currAMCallNum);
             //a preset HAS been selected, start at that preset call number
+            if(currAMCallNum > 88.0 && currAMCallNum < 108.0 ){
+              audioStop();
+              currAMCallNum = parseFloat(currAMCallNum);
+              currAMCallNum = (currAMCallNum+0.1).toFixed(1);
+              for(i=0; i<amCallNumbers.length; i++){
+                if(currAMCallNum  == amCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(currAMCallNum, signal);
+                  audioPlay(stations.amStations[currAMCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              radioDisplay(currAMCallNum, signal);
+            }
+
           } else {
             //a preset HAS NOT been selected, start at the first call number
-            console.log("amCallNum: "+amCallNum); 
+            console.log("a preset HAS NOT been selected");
+            //console.log("amCallNum: "+amCallNum);
+            if(amCallNum > 540 && amCallNum < 1600 ){
+              audioStop();
+              amCallNum = parseInt(amCallNum);
+              amCallNum = (amCallNum+10);
+              console.log("amCallNum: "+amCallNum);
+              for(i=0; i<amCallNumbers.length; i++){
+                if(amCallNum == amCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(amCallNum, signal);
+                  audioPlay(stations.amStations[amCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              console.log("amCallNum: "+amCallNum);
+              radioDisplay(amCallNum, signal);
+            } 
           }
         } else {
           //its in FM mode
@@ -689,7 +733,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
               }
               radioDisplay(fmCallNum, signal);
-
             } 
           }
         }
@@ -699,6 +742,102 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var tunerDown = document.getElementById("down-button"); 
   tunerDown.addEventListener("click", function(event){
       console.log("tuner down");
+
+      if(autoManual === false){
+        // auto tuner
+        console.log("autoTuner");
+      } else {
+        console.log("Manual Tuner");
+        // manual tuner selected
+        if(functions[2] === true){
+          console.log("its in AM mode");
+          //its in AM mode
+          if(currAMCallNum !== undefined){
+            console.log("a preset HAS been selected");
+            console.log("currAMCallNum: "+currAMCallNum);
+            //a preset HAS been selected, start at that preset call number
+            if(currAMCallNum > 88.0 && currAMCallNum < 108.0 ){
+              audioStop();
+              currAMCallNum = parseFloat(currAMCallNum);
+              currAMCallNum = (currAMCallNum-0.1).toFixed(1);
+              for(i=0; i<amCallNumbers.length; i++){
+                if(currAMCallNum  == amCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(currAMCallNum, signal);
+                  audioPlay(stations.amStations[currAMCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              radioDisplay(currAMCallNum, signal);
+            }
+
+          } else {
+            //a preset HAS NOT been selected, start at the first call number
+            console.log("a preset HAS NOT been selected");
+            //console.log("amCallNum: "+amCallNum);
+            if(amCallNum > 540 && amCallNum < 1600 ){
+              audioStop();
+              amCallNum = parseInt(amCallNum);
+              amCallNum = (amCallNum-10);
+              console.log("amCallNum: "+amCallNum);
+              for(i=0; i<amCallNumbers.length; i++){
+                if(amCallNum == amCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(amCallNum, signal);
+                  audioPlay(stations.amStations[amCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              console.log("amCallNum: "+amCallNum);
+              radioDisplay(amCallNum, signal);
+            } 
+          }
+        } else {
+          //its in FM mode
+          if(currFMCallNum !== undefined){
+            //a preset HAS been selected, start at that preset call number
+            console.log("currFMCallNum: "+ currFMCallNum);
+            if(currFMCallNum > 88.0 && currFMCallNum < 108.0 ){
+              audioStop();
+              currFMCallNum = parseFloat(currFMCallNum);
+              currFMCallNum = (currFMCallNum-0.1).toFixed(1);
+              for(i=0; i<fmCallNumbers.length; i++){
+                if(currFMCallNum  == fmCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(currFMCallNum, signal);
+                  audioPlay(stations.fmStations[currFMCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              radioDisplay(currFMCallNum, signal);
+            } 
+          } else {
+            console.log("fmCallNum: "+ typeof fmCallNum);
+            //a preset HAS NOT been selected, start at the first call number
+            if(fmCallNum > 88.0 && fmCallNum < 108.0 ){
+              audioStop();
+              fmCallNum = parseFloat(fmCallNum);
+              fmCallNum = (fmCallNum-0.1).toFixed(1);
+              for(i=0; i<fmCallNumbers.length; i++){
+                if(fmCallNum == fmCallNumbers[i]){
+                  console.log("there is a match!!!");
+                  radioDisplay(fmCallNum, signal);
+                  audioPlay(stations.fmStations[fmCallNum]);
+                  console.log("audio.src: "+audio.src);
+                  break;
+                }
+              }
+              radioDisplay(fmCallNum, signal);
+            } 
+          }
+        }
+      }
+
+
+
   }, false);
 
   function powerOnDisplay(){
