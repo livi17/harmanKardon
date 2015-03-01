@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var tapeMonitor = [false, false, true]; // tape1, tape2, source
   var functions = [false, false, false, true]; // phonp, aux, am, fm
   var autoManual = false; // false is auto, true is manual
+  var presetClicked = false;
 
   var amCallNumbers = [];// all call station numbers
   var amURLs = []; // all URL's for streaming stations
@@ -23,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var amSelected = []; // the 8 selected presets... randomized on load
   
   var currAMPreset; // the current selected preset
-  var currAMCallNum; // the current am call stayion number
+  var currAMCallNum; // the current am call station number
   var currAMURL; // the current am url
 
   var fmCallNumbers = []; // all call station numbers
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var fmSelected=[]; // the 8 selected presets... randomized on load
   
   var currFMPreset; // the current selected preset
-  var currFMCallNum; // the current fm call stayion number
+  var currFMCallNum; // the current fm call station number
   var currFMURL; // the current fm url
 
 
@@ -187,45 +188,74 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   })(); // end of init();
 
-  function radioPresetSwitch(a){
-        //console.log("typeof a: "+typeof a);
-        console.log("radioSwitch(a): "+ a);
-        for(i = 1; i < 9; i++){
+  function allPresetLightsOff(){
+    for(i = 1; i < 9; i++){
           var shutOff = document.getElementById("preset"+i);
           shutOff.className  = "glass-button-off";
         }
+  }
 
+  function radioPresetSwitch(a){
+        //console.log("typeof a: "+typeof a);
+
+        allPresetLightsOff();
+        var a = parseInt(a);
         if(power === true && tapeMonitor[2] === true){
                       digitsOn();
-                      audioPlay(amUrl);
                       signalLightsOff();
                       signalLightsOn();
         }
-
+        function presetPlay(){
+          console.log("fm: " + fm + " am: "+am)
+          if(functions[2] === true){
+              currAMPreset = parseInt(a);
+              console.log("currAMPreset: "+ currAMPreset);
+              audioPlay(amURLs[amSelected[a]]);
+              currAMCallNum = amCallNumbers[amSelected[a]];
+              currAMURL = amURLs[amSelected[a]];
+              radioDisplay(currAMCallNum, signal);
+            } else if (functions[3] === true){
+              currFMPreset = parseInt(a);
+              console.log("currFMPreset: "+ currFMPreset);
+              audioPlay(fmURLs[fmSelected[a]]);
+              currFMCallNum = fmCallNumbers[fmSelected[a]];
+              currFMURL = fmURLs[fmSelected[a]];
+              radioDisplay(currFMCallNum, signal);
+            }
+        }
+        console.log("radioSwitch(a): "+ a);
         switch (a) {
             case 0:
             document.getElementById("preset1").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 1:
             document.getElementById("preset2").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 2:
             document.getElementById("preset3").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 3:
             document.getElementById("preset4").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 4:
             document.getElementById("preset5").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 5:
             document.getElementById("preset6").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 6:
             document.getElementById("preset7").className  = "glass-button-on";
+            presetPlay();
             break; 
             case 7:
             document.getElementById("preset8").className  = "glass-button-on";
+            presetPlay();
             break; 
         }
     }
@@ -302,9 +332,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     
 
   function radioDisplay(callNum, signal){
-    console.log("signal: "+ signal);
+    
+    console.log("callNum: "+ callNum);
   	currCallNum  = callNum.split('.').join("");
-  	console.log("currCallNum: "+ currCallNum);
+  	//console.log("currCallNum: "+ currCallNum);
 
   	if(currCallNum.length==4){
       num4 = currCallNum.substr(3,1);
@@ -415,6 +446,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
               digitsOff();
               signalLightsOff();
               audioStop();
+              allPresetLightsOff();
             }
             break; 
 
@@ -426,30 +458,54 @@ document.addEventListener("DOMContentLoaded", function(event) {
               digitsOff();
               signalLightsOff();
               audioStop();
+              allPresetLightsOff();
             }
             break; 
 
             case "func-3":
             console.log("am selected");
             functions[2] = true;
+            am = true;
+            fm = false;
             if(power === true && tapeMonitor[2] === true){
               digitsOn();
-              radioDisplay(amCallNum, signal);
-              audioPlay(amUrl);
+              if(currAMCallNum !== undefined){
+                radioDisplay(currAMCallNum, signal);
+                audioPlay(currAMURL);
+                allPresetLightsOff();
+                radioPresetSwitch(currAMPreset);
+              } else {
+                radioDisplay(amCallNumbers[0], signal);
+                audioPlay(amURLs[0]);
+                allPresetLightsOff();
+              }
               signalLightsOff();
               signalLightsOn();
+              
             }
             break; 
 
             case "func-4":
             console.log("fm selected");
             functions[3] = true;
+            am = false;
+            fm = true;
             if(power === true && tapeMonitor[2] === true){
               digitsOn();
-              radioDisplay(fmCallNum, signal);
-              audioPlay(fmUrl);
+              if(currFMCallNum !== undefined){
+                radioDisplay(fmCallNum, signal);
+                audioPlay(fmUrl);
+                allPresetLightsOff();
+                radioPresetSwitch(currFMPreset);
+              } else {
+                radioDisplay(fmCallNumbers[0], signal);
+                audioPlay(fmURLs[0]);
+                allPresetLightsOff();
+              }
+              
               signalLightsOff();
               signalLightsOn();
+              
             }
             break; 
           }
@@ -643,6 +699,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       powerOffDisplay();
       radioDisplay(fmCallNum, signal);
       audioStop();
+      allPresetLightsOff();
       document.getElementById("power-button").className  = "vertical-button-off";
     }
   }, false);
@@ -660,7 +717,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 
-
+  console.log("currFMCallNum: "+ currFMCallNum);
 
   console.dir(audio);
 	
