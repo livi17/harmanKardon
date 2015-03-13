@@ -157,6 +157,30 @@
 		minDegree: 0
 	});
 
+
+	var upperLimit = 140;
+	var mid = 0;
+	var lowerLimit = -140;
+	var gain;
+
+	function volumeTest(volume){
+		volume = parseInt(volume);
+		console.log("volume: "+ volume);
+		console.log("volume.type: "+ volume.type);
+		if(volume >= lowerLimit &&  volume < -0.9){
+			console.log("below 50%");
+			gain = 50-(volume*0.3575)-100;
+			console.log("50-(volume*2.8): "+ gain);
+		} else if(volume == mid){
+			console.log("halfway");
+
+		} else if(volume <= upperLimit &&  volume > 0.1){
+			console.log("above 50%");
+			gain = 50+(volume*0.3575);
+			console.log("50+(volume*2.8): "+ gain);
+
+		}
+	}
 	</script>
 </body>
 </html>

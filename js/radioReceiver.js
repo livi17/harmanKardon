@@ -1,9 +1,10 @@
 /*
  * radioReceiver.js - v 1.0
  *
- * Copyright (c) 2014 Michael Lariviere (leaffan1984@gmail.com)
+ * Copyright (c) 2014 Michael LaRiviere (leaffan1984@gmail.com)
  * Licensed under the MIT license
  */
+
 document.addEventListener("DOMContentLoaded", function(event) {
 
     var power = false;
@@ -17,6 +18,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var autoManual = false; // false is auto, true is manual
     var presetClicked = false;
     var memory = false;
+    var context;
+    var source;
+    var gainNode;
+    var speaker1 = true;
+    var speaker2 = false;
+    var tapeCopy = false;
+    var subSonic = false;
+
+    //Filters
+    var bassTurnover = false;
+    var bassTurnoverFilter;
+    var toneDefeat = false;
+    var toneDefeatFilter;
+    var trebleTurnover = false;
+    var trebleTurnoverFilter;
+    var loudness = false;
+    var loudnessTrebFilter;
+    var loudnessBassFilter;
 
     var amCallNumbers = []; // all call station numbers
     var amURLs = []; // all URL's for streaming stations
@@ -35,6 +54,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currFMPreset; // the current selected preset
     var currFMCallNum; // the current fm call station number
     var currFMURL; // the current fm url
+
+   
 
 
     var audio = document.getElementById('audio');
@@ -135,7 +156,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } // end of digitsOn();
 
     (function init() {
+
         digitsOff();
+
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext();
+        source = context.createMediaElementSource(document.getElementById('audio'));
+        gainNode = context.createGain();
+
+        //gainNode.connect(context.destination);
+        bassTurnoverFilter = context.createBiquadFilter();
+        trebleTurnoverFilter = context.createBiquadFilter();
+        loudnessTrebFilter = context.createBiquadFilter();
+        loudnessBassFilter = context.createBiquadFilter();
+
+        document.getElementById("status").innerHTML += "audio API works!<br>";
 
         //push the FM stations into an array, and make a number
         (function pushFM() {
@@ -158,6 +193,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         }());
         //console.log("fmCallnumbers: " + fmCallNumbers);
+
+        document.getElementById("speaker1").className = "square-button-down";
 
         //push the inital start FM station to the first station in the array
         fmCallNum = fmCallNumbers[0];
@@ -368,11 +405,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
 
+
     function audioPlay(url) {
             audio.src = url;
             audio.load();
             audio.play();
             signalLightsOn();
+            source.connect(context.destination);
         } //end of play();¸
 
     function audioStop(url) {
@@ -984,9 +1023,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }, 100);
                 } //end of if
             } else {
-                ////console.log("AUTO: its in FM mode");
+                console.log("AUTO: its in FM mode");
+                console.log("currFMCallNum: "+currFMCallNum);
                 if (currFMCallNum !== undefined) {
-                    ////console.log("AUTO: an FM preset HAS been selected");
+                    console.log("AUTO: an FM preset HAS been selected");
                     //console.log("fmCallNum: " + fmCallNum);
                     //console.log("currFMCallNum: " + currFMCallNum);
                     //a preset HAS NOT been selected, start at the first call number
@@ -1031,6 +1071,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                     clearInterval(fmAutoSearchUp);
                                     audioPlay(stations.fmStations[tempFMCallNum]);
                                     break;
+                                } else if(currFMCallNum === 880){
+                                    clearInterval(fmAutoSearchUp);
+                                    break;
                                 }
                             }
                         } else {
@@ -1038,15 +1081,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }
                     }, 100);
                 } else {
-                    //console.log("AUTO: an FM preset HAS NOT been selected");
+                    console.log("AUTO: an FM preset HAS NOT been selected");
                     var fmAutoSearchNPDown = setInterval(function() {
                         fmCallNum -= 1;
                         var tempFMCallNum;
                         if (fmCallNum > 879) {
                             for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                                ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                                ////console.log("amCallNum: "+ amCallNum);
-                                ////console.log("amCallNum.length: "+ amCallNum.length);
+                                console.log("typeof amCallNum: "+ typeof amCallNum);
+                                console.log("amCallNum: "+ amCallNum);
+                                console.log("amCallNum.length: "+ amCallNum.length);
                                 var stupid = String(fmCallNum);
                                 //console.log("stupid: " + stupid);
                                 //console.log("stupid.length: " + stupid.length);
@@ -1074,11 +1117,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 }
 
 
-
+                                console.log("fmCallNum: "+ fmCallNum);
                                 if (fmCallNum == fmCallNumbers[i]) {
                                     tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
                                     clearInterval(fmAutoSearchNPDown);
                                     audioPlay(stations.fmStations[tempFMCallNum]);
+                                    break;
+                                } else if(fmCallNum === 880){
+                                    clearInterval(fmAutoSearchNPDown);
                                     break;
                                 }
                             }
@@ -1204,7 +1250,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* --- down tuner button functionality --*/
     var tunerDown = document.getElementById("down-button");
     tunerDown.addEventListener("click", function(event) {
-        ////console.log("tuner down");
+        console.log("tuner down");
 
         if (autoManual === false) {
             autoDown();
@@ -1261,6 +1307,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 //its in FM mode
                 if (currFMCallNum !== undefined) {
+                    console.log("fmCallNum: " + typeof fmCallNum);
                     //a preset HAS been selected, start at that preset call number
                     ////console.log("currFMCallNum: " + currFMCallNum);
                     var tempFMCallNum;
@@ -1282,7 +1329,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         radioDisplay(currFMCallNum, signal);
                     }
                 } else {
-                    //console.log("fmCallNum: " + typeof fmCallNum);
+                    console.log("fmCallNum: " + typeof fmCallNum);
                     //a preset HAS NOT been selected, start at the first call number
                     var tempFMCallNum;
                     if (fmCallNum > 879 && fmCallNum < 1081) {
@@ -1290,12 +1337,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         fmCallNum -= 1;
                         //console.log("fmCallNum: " + fmCallNum);
                         for (i = 0; i < fmCallNumbers.length; i++) {
+                            console.log("fmCallNum: "+ fmCallNum);
                             if (fmCallNum == fmCallNumbers[i]) {
                                 tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
                                 ////console.log("there is a match!!!");
                                 radioDisplay(fmCallNum, signal);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
                                 ////console.log("audio.src: " + audio.src);
+                                break;
+                            } else if(fmCallNum === 880){
                                 break;
                             }
                         }
@@ -1305,6 +1355,167 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         }
     }, false);
+
+    
+
+    var bassTurnoverBut = document.getElementById("bass-turnover-button");
+    bassTurnoverBut.addEventListener("click", function(event) {
+        bassTurnover = !bassTurnover;
+        if(bassTurnover){
+            bassTurnoverBut.className = "square-button-down";
+            if(bassTurnoverFilter !== undefined){
+                bassTurnoverFilter.disconnect();
+            }
+            source.connect(bassTurnoverFilter); //and of course connect it
+            bassTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+            bassTurnoverFilter.frequency.value = 200; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+            bassTurnoverFilter.q = 500; //the q
+            bassTurnoverFilter.gain.value = 0; //the gain 
+            bassTurnoverFilter.connect(context.destination);//now we want to connect that to the output
+        } else {
+            bassTurnoverBut.className = "square-button-up";
+            console.log("bassTurnover off");
+            //Now we want to create a filter
+            if(bassTurnoverFilter !== undefined){
+                bassTurnoverFilter.disconnect();
+            }
+            source.connect(bassTurnoverFilter); //and of course connect it
+            bassTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+            bassTurnoverFilter.frequency.value = 400; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+            bassTurnoverFilter.q = 500; //the q
+            bassTurnoverFilter.gain.value = 0; //the gain 
+            bassTurnoverFilter.connect(context.destination);//now we want to connect that to the output
+        }
+        //filter.frequency.setValueAtTime(0.0, context.currentTime);
+        //filter.frequency.linearRampToValueAtTime(120.0, context.currentTime+10);
+    }, false);
+
+    var toneDefeatBut = document.getElementById("tone-defeat-button");
+    toneDefeatBut.addEventListener("click", function(event) {
+        toneDefeat = !toneDefeat;
+        if(toneDefeat){
+            toneDefeatBut.className = "square-button-down";
+        } else {
+            toneDefeatBut.className = "square-button-up";
+        }
+
+    }, false);
+
+    var trebleTurnoverBut = document.getElementById("treble-turnover-button");
+    trebleTurnoverBut.addEventListener("click", function(event) {
+        trebleTurnover = !trebleTurnover;
+        if(trebleTurnover){
+            trebleTurnoverBut.className = "square-button-down";
+            if(trebleTurnoverFilter !== undefined){
+                trebleTurnoverFilter.disconnect();
+            }
+            source.connect(trebleTurnoverFilter); //and of course connect it
+            trebleTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+            trebleTurnoverFilter.frequency.value = 2000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+            trebleTurnoverFilter.q = 500; //the q
+            trebleTurnoverFilter.gain.value = 0; //the gain 
+            trebleTurnoverFilter.connect(context.destination);//now we want to connect that to the output
+        } else {
+            trebleTurnoverBut.className = "square-button-up";
+            //Now we want to create a filter
+            if(trebleTurnoverFilter !== undefined){
+                trebleTurnoverFilter.disconnect();
+            }
+            source.connect(trebleTurnoverFilter); //and of course connect it
+            trebleTurnoverFilter.type = "lowhpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+            trebleTurnoverFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+            trebleTurnoverFilter.q = 500; //the q
+            trebleTurnoverFilter.gain.value = 0; //the gain 
+            trebleTurnoverFilter.connect(context.destination);//now we want to connect that to the output
+        }
+    }, false);
+
+
+    var speaker1But = document.getElementById("speaker1");
+        speaker1But.addEventListener("click", function(event) {
+            speaker1 = !speaker1;
+            if(speaker1){
+                speaker1But.className = "square-button-down";
+                source.connect(context.destination);
+            } else {
+                speaker1But.className = "square-button-up";
+                source.disconnect(context.destination);
+            }
+    }, false);
+
+    var speaker2But = document.getElementById("speaker2");
+        speaker2But.addEventListener("click", function(event) {
+            speaker2 = !speaker2;
+            if(speaker2){
+                speaker2But.className = "square-button-down";
+                //source.connect(context.destination);
+            } else {
+                speaker2But.className = "square-button-up";
+                //source.disconnect(context.destination);
+            }
+    }, false);
+
+    var tapeCopyBut = document.getElementById("tape-copy-button");
+        tapeCopyBut.addEventListener("click", function(event) {
+            tapeCopy = !tapeCopy;
+            if(tapeCopy){
+                tapeCopyBut.className = "square-button-down";
+                //source.connect(context.destination);
+            } else {
+                tapeCopyBut.className = "square-button-up";
+                //source.disconnect(context.destination);
+            }
+    }, false);
+
+    var subSonicBut = document.getElementById("supsonic-filter-button");
+        subSonicBut.addEventListener("click", function(event) {
+            subSonic = !subSonic;
+            if(subSonic){
+                subSonicBut.className = "square-button-down";
+                //source.connect(context.destination);
+            } else {
+                subSonicBut.className = "square-button-up";
+                //source.disconnect(context.destination);
+            }
+    }, false);
+
+    var loudnessBut = document.getElementById("loudness-button");
+        loudnessBut.addEventListener("click", function(event) {
+            loudness = !loudness;
+            if(loudness){
+                loudnessBut.className = "square-button-down";
+                if(loudnessTrebFilter !== undefined){
+                    loudnessTrebFilter.disconnect();
+                }
+                source.connect(loudnessTrebFilter); //and of course connect it
+                loudnessTrebFilter.type = "highshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+                loudnessTrebFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+                loudnessTrebFilter.q = 500; //the q
+                loudnessTrebFilter.gain.value = 2; //the gain 
+                loudnessTrebFilter.connect(context.destination);//now we want to connect that to the output
+
+                if(loudnessBassFilter !== undefined){
+                    loudnessBassFilter.disconnect();
+                }
+                source.connect(loudnessBassFilter); //and of course connect it
+                loudnessBassFilter.type = "lowshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+                loudnessBassFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+                loudnessBassFilter.q = 500; //the q
+                loudnessBassFilter.gain.value = 2; //the gain 
+                loudnessBassFilter.connect(context.destination);//now we want to connect that to the output
+            } else {
+                loudnessBut.className = "square-button-up";
+                //source.disconnect(context.destination);
+                if(loudnessTrebFilter !== undefined){
+                    loudnessTrebFilter.disconnect();
+                }
+                if(loudnessBassFilter !== undefined){
+                    loudnessBassFilter.disconnect();
+                }
+                source.connect(context.destination);
+            }
+    }, false);
+
 
  /* --- down tuner button functionality --*/
     var memoryButton = document.getElementById("memory-button");
@@ -1455,7 +1666,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
+    }).on("mousemove", function(event){
+        var volume = (event.target.rotation + 140) / 280;
+        gainNode.gain.value = volume;
+        source.disconnect();
+        source.connect(gainNode);
+        gainNode.connect(context.destination);
+    }).on("mouseup", function(event){
+
     });
 
 
+    //volumeDial.angle(-140);
 }); // end of DOMContentLoaded
