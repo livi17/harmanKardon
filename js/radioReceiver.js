@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         loudnessTrebFilter = context.createBiquadFilter();
         loudnessBassFilter = context.createBiquadFilter();
 
-        document.getElementById("status").innerHTML += "audio API works!<br>";
+        //document.getElementById("status").innerHTML += "audio API works!<br>";
 
         //push the FM stations into an array, and make a number
         (function pushFM() {
