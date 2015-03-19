@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var loudness = false;
     var loudnessTrebFilter;
     var loudnessBassFilter;
+    var trebleLevelFilter;
+    var bassLevelFilter;
 
     var amCallNumbers = []; // all call station numbers
     var amURLs = []; // all URL's for streaming stations
@@ -169,6 +171,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         trebleTurnoverFilter = context.createBiquadFilter();
         loudnessTrebFilter = context.createBiquadFilter();
         loudnessBassFilter = context.createBiquadFilter();
+        trebleLevelFilter = context.createBiquadFilter();
+        bassLevelFilter = context.createBiquadFilter();
 
         //document.getElementById("status").innerHTML += "audio API works!<br>";
 
@@ -1633,9 +1637,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
         zIndex: '100',
         touchMode: 'wheel',
         knobSize: '10%',
-        minDegree: -120,
-        maxDegree: 120,
+        minDegree: -140,
+        maxDegree: 140,
         degreeStartAt: 0
+    }).on("mousemove", function(event){
+        var bass = (event.target.rotation + 140) / 280;
+        console.log("bass: "+bass);
+        if(bassLevelFilter !== undefined){
+            bassLevelFilter.disconnect();
+        }
+        source.connect(bassLevelFilter); //and of course connect it
+        bassLevelFilter.type = "lowshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+        bassLevelFilter.frequency.value = 800; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+        bassLevelFilter.gain.value = bass; //the gain 
+        bassLevelFilter.connect(context.destination);//now we want to connect that to the output
+    }).on("mouseup", function(event){
+
     });
     var trebleDial = JogDial(document.getElementById('treble-knob'), {
         debug: false,
@@ -1643,9 +1660,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
         zIndex: '100',
         touchMode: 'wheel',
         knobSize: '10%',
-        minDegree: -120,
-        maxDegree: 120,
+        minDegree: -140,
+        maxDegree: 140,
         degreeStartAt: 0
+    }).on("mousemove", function(event){
+
+        var treble = (event.target.rotation + 140) / 280;
+        console.log("treble: "+treble);
+        if(trebleLevelFilter !== undefined){
+            trebleLevelFilter.disconnect();
+        }
+        source.connect(trebleLevelFilter); //and of course connect it
+        trebleLevelFilter.type = "highshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
+        trebleLevelFilter.frequency.value = 200; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
+        trebleLevelFilter.gain.value = treble; //the gain 
+        trebleLevelFilter.connect(context.destination);//now we want to connect that to the output
+    }).on("mouseup", function(event){
+
     });
     var balanceDial = JogDial(document.getElementById('balance-knob'), {
         debug: false,
@@ -1653,9 +1684,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         zIndex: '100',
         touchMode: 'wheel',
         knobSize: '10%',
-        minDegree: -120,
-        maxDegree: 120,
+        minDegree: -140,
+        maxDegree: 140,
         degreeStartAt: 0
+    }).on("mousemove", function(event){
+    }).on("mouseup", function(event){
+
     });
     var volumeDial = JogDial(document.getElementById('volume-knob'), {
         debug: false,
