@@ -25,20 +25,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var speaker2 = false;
     var tapeCopy = false;
     var subSonic = false;
-    var currVolume = 0.50;
     var currBassGain = 0;
     var currTrebGain = 0;
 
     //Filters
-    var bassTurnover = false;
+
     var bassTurnoverFilter;
-    var toneDefeat = false;
     var toneDefeatFilter;
     var trebleTurnover = false;
     var trebleTurnoverFilter;
-    var loudness = false;
     var loudnessTrebFilter;
     var loudnessBassFilter;
+
+    var bassTurnover = false;
+    var trebTurnover = false;
+    var toneDefeat = false;
+    var loudness = false;
+    var currVolume = 0.5;
+    var lastVolume;
+    var mute = false;
+    var currTrebFiltGain;
+    var currBassFiltGain;
+    var stereo = false;
 
     var amCallNumbers = []; // all call station numbers
     var amURLs = []; // all URL's for streaming stations
@@ -162,18 +170,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         digitsOff();
 
+        // setup the web audio api
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        context = new AudioContext();
-        source = context.createMediaElementSource(document.getElementById('audio'));
-        gainNode = context.createGain();
+        var context = new AudioContext();
+        var source = context.createMediaElementSource(document.getElementById('audio'));
+        var gainNode = context.createGain();
 
-        //gainNode.connect(context.destination);
-        bassTurnoverFilter = context.createBiquadFilter();
-        trebleTurnoverFilter = context.createBiquadFilter();
-        loudnessTrebFilter = context.createBiquadFilter();
-        loudnessBassFilter = context.createBiquadFilter();
-
-        //document.getElementById("status").innerHTML += "audio API works!<br>";
+        var bassFilter = context.createBiquadFilter();
+            bassFilter.type = "lowshelf";
+        var trebFilter = context.createBiquadFilter();
+            trebFilter.type = "highshelf";
+        var panner = context.createPanner();
+            panner.panningModel = 'equalpower';
+            panner.distanceModel = 'inverse';
+            panner.refDistance = 1;
+            panner.maxDistance = 10000;
+            panner.rolloffFactor = 1;
+            panner.coneInnerAngle = 360;
+            panner.coneOuterAngle = 0;
+            panner.coneOuterGain = 0;
+            panner.setOrientation(1,0,0);
+        var listener = context.listener;
+            listener.setOrientation(0,0,-1,0,1,0);
 
         //push the FM stations into an array, and make a number
         (function pushFM() {

@@ -94,7 +94,7 @@
 			background: url('img/base_one_knob.png');
 			background-repeat: no-repeat;
 		}
-		#treble-knob, #bass-knob{
+		#treble-knob, #bass-knob, #balance-knob{
 			position: relative;
 			height:34px;
 			width: 34px;
@@ -108,6 +108,7 @@
 		<button id="treb-turnover-button">Treb Turnover</button>
 		<button id="loudness-button">Loudness</button>
 		<button id="mute-button">Mute</button><br>
+		<button id="stereo-button">Stereo</button><br>
 
 		<br>
 		<div id="bassStatus"></div><br>
@@ -121,8 +122,10 @@
 		<br>
 		bass
 		<div id="bass-knob" class="knob big-knob"><br>
-			treble
+		treble
 		<div id="treble-knob" class="knob big-knob"><br>
+		balance
+		<div id="balance-knob" class="knob big-knob"><br>
 		<div id="volume">
 			<div id="volume-text" class="interfaceText-uppercase">VOLUME</div>
 			<div id="volume-dial-holder">
@@ -142,6 +145,18 @@
 			bassFilter.type = "lowshelf";
 		var trebFilter = context.createBiquadFilter();
 			trebFilter.type = "highshelf";
+		var panner = context.createPanner();
+			panner.panningModel = 'equalpower';
+			panner.distanceModel = 'inverse';
+			panner.refDistance = 1;
+			panner.maxDistance = 10000;
+			panner.rolloffFactor = 1;
+			panner.coneInnerAngle = 360;
+			panner.coneOuterAngle = 0;
+			panner.coneOuterGain = 0;
+			panner.setOrientation(1,0,0);
+		var listener = context.listener;
+			listener.setOrientation(0,0,-1,0,1,0);
 	
 		var bassTurnover = false;
 		var trebTurnover = false;
@@ -152,6 +167,7 @@
 		var mute = false;
 		var currTrebFiltGain;
 		var currBassFiltGain;
+		var stereo = false;
 
 		gainNode.gain.value = currVolume;
 
@@ -192,14 +208,61 @@
 				eq();
 			});
 
+			var stereoBut = document.getElementById("stereo-button");
+			stereoBut.addEventListener("click", function(event) {
+				stereo = !stereo;
+				console.log("stereo: "+stereo);
+				if(stereo){
+					panner.panningModel = 'equalpower';
+				} else {
+					panner.panningModel = 'HRTF';
+				} 
+
+				eq();
+			});
+
+			function pan(range) {
+			  var xDeg = parseInt(range);
+			  var zDeg = xDeg + 280;
+			  if (zDeg > 280) {
+			    zDeg = 540 - zDeg;
+			  }
+			  var x = Math.sin(xDeg * (Math.PI / 540));
+			  var z = Math.sin(zDeg * (Math.PI / 540));
+			  panner.setPosition(x, 0, z);
+			  console.log("range: "+range);
+			  console.log("xDeg: "+xDeg);
+			  console.log("x: "+x);
+			  console.log("z: "+z);
+			}
+
+			var balanceDial = JogDial(document.getElementById('balance-knob'), {
+		        debug: true,
+		        wheelSize: '90%',
+		        zIndex: '100',
+		        touchMode: 'wheel',
+		        knobSize: '10%',
+		        minDegree: -140,
+		        maxDegree: 140,
+		        degreeStartAt: 0
+		    }).on("mousemove", function(event){
+		        var balance =  Math.round(event.target.rotation);
+		        pan(balance);
+		        console.log("balance1: "+balance);
+
+
+		        //document.getElementById("bassFilterGainStatus").innerHTML = "bassFilter.gain.value: "+bassFilter.gain.value;      
+		    })
+
+
 			var bassDial = JogDial(document.getElementById('bass-knob'), {
 		        debug: true,
 		        wheelSize: '90%',
 		        zIndex: '100',
 		        touchMode: 'wheel',
 		        knobSize: '10%',
-		        minDegree: -120,
-		        maxDegree: 120,
+		        minDegree: -140,
+		        maxDegree: 140,
 		        degreeStartAt: 0
 		    }).on("mousemove", function(event){
 		        var bass = currBassFiltGain + (event.target.rotation + 140) / 280 * 10;
@@ -215,8 +278,8 @@
 		        zIndex: '100',
 		        touchMode: 'wheel',
 		        knobSize: '10%',
-		        minDegree: -120,
-		        maxDegree: 120,
+		        minDegree: -140,
+		        maxDegree: 140,
 		        degreeStartAt: 0
 		    }).on("mousemove", function(event){
 		    	var treble = currTrebFiltGain + (event.target.rotation + 140) / 280 * 10;
@@ -312,7 +375,8 @@
 				document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;    	
 				
 			}
-				source.connect(gainNode);
+				source.connect(panner);
+				panner.connect(gainNode);
 				gainNode.connect(bassFilter);
 				bassFilter.connect(trebFilter); 
 				trebFilter.connect(context.destination);
