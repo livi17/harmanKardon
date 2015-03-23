@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var speaker2 = false;
     var tapeCopy = false;
     var subSonic = false;
+    var currVolume = 0.50;
+    var currBassGain = 0;
+    var currTrebGain = 0;
 
     //Filters
     var bassTurnover = false;
@@ -1412,7 +1415,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             source.connect(trebleTurnoverFilter); //and of course connect it
             trebleTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
             trebleTurnoverFilter.frequency.value = 2000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
-            trebleTurnoverFilter.q = 500; //the q
             trebleTurnoverFilter.gain.value = 0; //the gain 
             trebleTurnoverFilter.connect(context.destination);//now we want to connect that to the output
         } else {
@@ -1424,7 +1426,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             source.connect(trebleTurnoverFilter); //and of course connect it
             trebleTurnoverFilter.type = "lowhpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
             trebleTurnoverFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
-            trebleTurnoverFilter.q = 500; //the q
             trebleTurnoverFilter.gain.value = 0; //the gain 
             trebleTurnoverFilter.connect(context.destination);//now we want to connect that to the output
         }
@@ -1490,8 +1491,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 source.connect(loudnessTrebFilter); //and of course connect it
                 loudnessTrebFilter.type = "highshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
                 loudnessTrebFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
-                loudnessTrebFilter.q = 500; //the q
-                loudnessTrebFilter.gain.value = 2; //the gain 
+                loudnessTrebFilter.gain.value = currBassGain+2; //the gain 
                 loudnessTrebFilter.connect(context.destination);//now we want to connect that to the output
 
                 if(loudnessBassFilter !== undefined){
@@ -1500,16 +1500,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 source.connect(loudnessBassFilter); //and of course connect it
                 loudnessBassFilter.type = "lowshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
                 loudnessBassFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
-                loudnessBassFilter.q = 500; //the q
-                loudnessBassFilter.gain.value = 2; //the gain 
+                loudnessBassFilter.gain.value = currBassGain+2; //the gain 
                 loudnessBassFilter.connect(context.destination);//now we want to connect that to the output
             } else {
                 loudnessBut.className = "square-button-up";
                 //source.disconnect(context.destination);
                 if(loudnessTrebFilter !== undefined){
+                    loudnessTrebFilter.gain.value = currTrebGain-2; //the gain 
                     loudnessTrebFilter.disconnect();
                 }
                 if(loudnessBassFilter !== undefined){
+                    loudnessBassFilter.gain.value = currBassGain-2; //the gain 
                     loudnessBassFilter.disconnect();
                 }
                 source.connect(context.destination);
@@ -1602,6 +1603,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
             ////console.log("power: " + power);
             powerOnDisplay();
+            gainNode.gain.value = volume;
             document.getElementById("power-button").className = "vertical-button-on";
         } else {
             powerOffDisplay();
@@ -1637,6 +1639,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         maxDegree: 120,
         degreeStartAt: 0
     });
+
     var trebleDial = JogDial(document.getElementById('treble-knob'), {
         debug: false,
         wheelSize: '90%',
@@ -1647,6 +1650,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         maxDegree: 120,
         degreeStartAt: 0
     });
+
     var balanceDial = JogDial(document.getElementById('balance-knob'), {
         debug: false,
         wheelSize: '90%',
@@ -1657,6 +1661,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         maxDegree: 120,
         degreeStartAt: 0
     });
+
     var volumeDial = JogDial(document.getElementById('volume-knob'), {
         debug: false,
         wheelSize: '90%',
@@ -1671,9 +1676,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         gainNode.gain.value = volume;
         source.disconnect();
         source.connect(gainNode);
-        gainNode.connect(context.destination);
+        gainNode.connect(context.destination);    
     }).on("mouseup", function(event){
-
+        currVolume = volume;
     });
 
 

@@ -1,0 +1,326 @@
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+		#volume{
+			position:relative;
+			margin-left: 27px;
+			width: 118px;
+			height:100%;
+			float:left;
+			text-align: center;
+		}
+		#volume-text {
+			display: block;
+			position: relative;
+			top: 22px;
+			width: 100%;
+			height: 11px;
+		}
+		#volume-dial-holder{
+			position: relative;
+			top:30px;
+			background-image: url('img/volume.png');
+			background-repeat: no-repeat;
+			width:108px;
+			margin: 0 auto;
+			height:108px;
+		}
+		#volume-knob{
+			position: relative;
+			top:13.2px;
+			height:83px;
+			width: 83px;
+			margin: 0 auto;
+		}
+		.knob:before{
+			content:"";
+			width: 100%;
+			height: 100%;
+			display: block;
+			z-index: -1;
+			position: relative;
+			padding: 3px;
+			background: #756D5A;
+			left: -3px;
+			top: -3px;
+			-webkit-border-radius: 100px;
+			-moz-border-radius: 100px;
+			border-radius: 100px;
+			-webkit-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+			-moz-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+			box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+		}
+		.knob:after {
+			content:"";
+			width: 100%;
+			height: 100%;
+			display: block;
+			z-index: -2;
+			position: relative;
+			padding: 5px;
+			background: #866949;
+			position: absolute;
+			left: -5px;
+			top: -5px;
+			-webkit-border-radius: 100px;
+			-moz-border-radius: 100px;
+			border-radius: 100px;
+			-webkit-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+			-moz-box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+			box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+		}
+		.big-knob{
+			background-color: #CEC0A3;
+		}
+
+		.knob-bg{
+			position: relative;
+			top:-7px;
+			margin-left: 8px;
+			width:48px;
+			height:54px;
+			background-image: url('img/sprite.png');
+			overflow: hidden;
+			background-position: -102px 0px;
+		}
+		#bass-treble-knobs > div:nth-child(4){
+			position: relative;
+			left: 40px;
+			top:-61px;
+		}
+		#bass-knob_knob, #treble-knob_knob, #balance-knob_knob, #volume-knob_knob{
+			background: url('img/base_one_knob.png');
+			background-repeat: no-repeat;
+		}
+		#treble-knob, #bass-knob{
+			position: relative;
+			height:34px;
+			width: 34px;
+		}
+		</style>
+	</head>
+	<body>
+
+		<button id="bass-turnover-button">Bass Turnover</button>
+		<button id="tone-defeat-button">Tone Defeat</button>
+		<button id="treb-turnover-button">Treb Turnover</button>
+		<button id="loudness-button">Loudness</button>
+		<button id="mute-button">Mute</button><br>
+
+		<br>
+		<div id="bassStatus"></div><br>
+		<div id="trebStatus"></div><br>
+		<div id="toneStatus"></div><br>
+		<div id="loudnessStatus"></div><br>
+		<div id="gainNodeStatus"></div><br>
+		<div id="trebFilterGainStatus"></div><br>
+		<div id="bassFilterGainStatus"></div><br>
+		<audio id="audio" controls="" src="http://cfjb.streamon.fm:8000/CFJB-48k.aac" autoplay=""></audio>
+		<br>
+		bass
+		<div id="bass-knob" class="knob big-knob"><br>
+			treble
+		<div id="treble-knob" class="knob big-knob"><br>
+		<div id="volume">
+			<div id="volume-text" class="interfaceText-uppercase">VOLUME</div>
+			<div id="volume-dial-holder">
+				<div id="volume-knob" class="knob big-knob">
+				</div>
+			</div>
+		</div>
+
+<script src="js/jogDial.js"></script>
+		<script>
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;
+		var context = new AudioContext();
+		var source = context.createMediaElementSource(document.getElementById('audio'));
+		var gainNode = context.createGain();
+
+		var bassFilter = context.createBiquadFilter();
+			bassFilter.type = "lowshelf";
+		var trebFilter = context.createBiquadFilter();
+			trebFilter.type = "highshelf";
+	
+		var bassTurnover = false;
+		var trebTurnover = false;
+		var toneDefeat = false;
+		var loudness = false;
+		var currVolume = 0.5;
+		var lastVolume;
+		var mute = false;
+		var currTrebFiltGain;
+		var currBassFiltGain;
+
+		gainNode.gain.value = currVolume;
+
+		document.addEventListener("DOMContentLoaded", function(event) {
+
+			var bassTurnoverBut = document.getElementById("bass-turnover-button");
+			bassTurnoverBut.addEventListener("click", function(event) {
+				bassTurnover = !bassTurnover;
+				console.log("bassTurnover: "+bassTurnover);
+				eq();
+			});
+
+			var trebTurnoverBut = document.getElementById("treb-turnover-button");
+			trebTurnoverBut.addEventListener("click", function(event) {
+				trebTurnover = !trebTurnover;
+				console.log("trebTurnover: "+trebTurnover);
+				eq();
+
+			});
+
+			var toneDefeatBut = document.getElementById("tone-defeat-button");
+			toneDefeatBut.addEventListener("click", function(event) {
+				toneDefeat = !toneDefeat;
+				eq();
+			});
+
+			var loudnessBut = document.getElementById("loudness-button");
+			loudnessBut .addEventListener("click", function(event) {
+				loudness = !loudness;
+				console.log("loudness: "+loudness);
+				eq();
+			});
+
+			var muteBut = document.getElementById("mute-button");
+			muteBut.addEventListener("click", function(event) {
+				mute = !mute;
+				console.log("mute: "+mute);
+				eq();
+			});
+
+			var bassDial = JogDial(document.getElementById('bass-knob'), {
+		        debug: true,
+		        wheelSize: '90%',
+		        zIndex: '100',
+		        touchMode: 'wheel',
+		        knobSize: '10%',
+		        minDegree: -120,
+		        maxDegree: 120,
+		        degreeStartAt: 0
+		    }).on("mousemove", function(event){
+		        var bass = currBassFiltGain + (event.target.rotation + 140) / 280 * 10;
+		        if(!toneDefeat){
+		        	bassFilter.gain.value = bass;
+		    	}
+		        document.getElementById("bassFilterGainStatus").innerHTML = "bassFilter.gain.value: "+bassFilter.gain.value;      
+		    })
+
+			var trebleDial = JogDial(document.getElementById('treble-knob'), {
+		        debug: true,
+		        wheelSize: '90%',
+		        zIndex: '100',
+		        touchMode: 'wheel',
+		        knobSize: '10%',
+		        minDegree: -120,
+		        maxDegree: 120,
+		        degreeStartAt: 0
+		    }).on("mousemove", function(event){
+		    	var treble = currTrebFiltGain + (event.target.rotation + 140) / 280 * 10;
+		        if(!toneDefeat){
+		        	trebFilter.gain.value = treble;
+		    	}
+		        document.getElementById("trebFilterGainStatus").innerHTML = "trebNode.gain.value: "+trebFilter.gain.value;      
+		    })
+
+			var volumeDial = JogDial(document.getElementById('volume-knob'), {
+		        debug: true,
+		        wheelSize: '90%',
+		        zIndex: '100',
+		        touchMode: 'wheel',
+		        knobSize: '3%',
+		        minDegree: -140,
+		        maxDegree: 140,
+		        degreeStartAt: 0
+		    }).on("mousemove", function(event){
+		        var volume = (event.target.rotation + 140) / 280;
+		        gainNode.gain.value = volume;
+		        document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;      
+		    }).on("mouseup", function(event){
+		        currVolume = volume;
+		    });
+
+			function eq(){
+				console.log("eq");
+				if(toneDefeat){
+					console.log("toneDefeatOn");
+					bassFilter.gain.value = 0;
+					trebFilter.gain.value = 0;
+					document.getElementById("trebStatus").innerHTML = "trebFilter.gain.value: "+ trebFilter.gain.value;
+					document.getElementById("bassStatus").innerHTML = "bassFilter.gain.value: "+ bassFilter.gain.value;
+				} else if (!toneDefeat){
+					console.log("toneDefeatOff");
+					if(trebTurnover){
+						console.log("trebFilter.frequency.value = 2000");
+						trebFilter.frequency.value = 2000;
+						if(loudness){
+							trebFilter.gain.value = 5;
+							currTrebFiltGain = trebFilter.gain.value;
+						} else {
+							trebFilter.gain.value = 2;
+							currTrebFiltGain = trebFilter.gain.value;
+						}
+						document.getElementById("trebStatus").innerHTML = "trebFilter.frequency.value: "+ trebFilter.frequency.value;
+					} else if(!trebTurnover){
+						console.log("trebFilter.frequency.value = 6000");
+						trebFilter.frequency.value = 6000;
+						if(loudness){
+							trebFilter.gain.value = 9;
+							currTrebFiltGain = trebFilter.gain.value;
+						} else {
+							trebFilter.gain.value = 6;
+							currTrebFiltGain = trebFilter.gain.value;
+						}
+						document.getElementById("trebStatus").innerHTML = "trebFilter.frequency.value: "+ trebFilter.frequency.value;
+					}
+
+					if(bassTurnover){
+						console.log("bassFilter.frequency.value = 200");
+						bassFilter.frequency.value = 200;
+						if(loudness){
+							bassFilter.gain.value = 5;
+							currBassFiltGain = bassFilter.gain.value;
+						} else {
+							bassFilter.gain.value = 2;
+							currBassFiltGain = bassFilter.gain.value;
+						}
+						document.getElementById("bassStatus").innerHTML = "bassFilter.frequency.value: "+ bassFilter.frequency.value;
+					} else if(!bassTurnover){
+						console.log("bassFilter.frequency.value = 400");
+						bassFilter.frequency.value = 400;
+						if(loudness){
+							bassFilter.gain.value = 9;
+							currBassFiltGain = bassFilter.gain.value;
+						} else {
+							bassFilter.gain.value = 6;
+							currBassFiltGain = bassFilter.gain.value;
+						}
+						document.getElementById("bassStatus").innerHTML = "bassFilter.frequency.value: "+ bassFilter.frequency.value;
+					}
+				}
+				if(mute){
+					gainNode.gain.value = 0;
+					lastVolume = currVolume;
+				} else {
+					gainNode.gain.value = lastVolume;
+				}
+				document.getElementById("toneStatus").innerHTML = "Tone Defeat: "+ toneDefeat; 
+				document.getElementById("loudnessStatus").innerHTML = "Loudness: "+loudness;
+				document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;    	
+				
+			}
+				source.connect(gainNode);
+				gainNode.connect(bassFilter);
+				bassFilter.connect(trebFilter); 
+				trebFilter.connect(context.destination);
+
+			eq();
+
+	}); // end of DOMContentLoaded
+
+	</script>
+	</body>
+	</html>
