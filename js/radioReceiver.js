@@ -5,7 +5,7 @@
  * Licensed under the MIT license
  */
 
-document.addEventListener("DOMContentLoaded", function(event) {
+ document.addEventListener("DOMContentLoaded", function(event) {
 
     var power = false;
     var phono = false;
@@ -18,9 +18,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var autoManual = false; // false is auto, true is manual
     var presetClicked = false;
     var memory = false;
-    var context;
-    var source;
-    var gainNode;
     var speaker1 = true;
     var speaker2 = false;
     var tapeCopy = false;
@@ -28,15 +25,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currBassGain = 0;
     var currTrebGain = 0;
 
-    //Filters
-
-    var bassTurnoverFilter;
-    var toneDefeatFilter;
-    var trebleTurnover = false;
-    var trebleTurnoverFilter;
-    var loudnessTrebFilter;
-    var loudnessBassFilter;
-
+    //web audio related:
+    var context;
+    var source;
+    var bassFilter;
+    var trebFilter;
+    var panner;
+    var listener;
+    var gainNode;
     var bassTurnover = false;
     var trebTurnover = false;
     var toneDefeat = false;
@@ -48,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currBassFiltGain;
     var stereo = false;
 
+    // radio preset related:
     var amCallNumbers = []; // all call station numbers
     var amURLs = []; // all URL's for streaming stations
     var amPresets = [false, true, false, false, false, false, false, false]; //which preset lights are on
@@ -66,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currFMCallNum; // the current fm call station number
     var currFMURL; // the current fm url
 
-   
+
 
 
     var audio = document.getElementById('audio');
@@ -140,17 +137,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //var url ="http://sc3.spacialnet.com:30430";
 
     function digitsOff() {
-            digit1.style.backgroundPosition = numbersOff;
-            digit2.style.backgroundPosition = numbersOff;
-            digit3.style.backgroundPosition = numbersOff;
-            digit4.style.backgroundPosition = numbersOff;
-            document.getElementById("decimal").className = "decimal-off";
-            document.getElementById("fm").className = "tuner-blue-sm off";
-            document.getElementById("am").className = "tuner-blue-sm off";
-            document.getElementById("MHz").className = "tuner-blue-sm off";
-            document.getElementById("kHz").className = "tuner-blue-sm off";
+        digit1.style.backgroundPosition = numbersOff;
+        digit2.style.backgroundPosition = numbersOff;
+        digit3.style.backgroundPosition = numbersOff;
+        digit4.style.backgroundPosition = numbersOff;
+        document.getElementById("decimal").className = "decimal-off";
+        document.getElementById("fm").className = "tuner-blue-sm off";
+        document.getElementById("am").className = "tuner-blue-sm off";
+        document.getElementById("MHz").className = "tuner-blue-sm off";
+        document.getElementById("kHz").className = "tuner-blue-sm off";
         } // end of digitsOff();
-    function digitsOn() {
+        function digitsOn() {
             digit1.style.backgroundPosition = numbersOff;
             digit2.style.backgroundPosition = numbersOff;
             digit3.style.backgroundPosition = numbersOff;
@@ -166,32 +163,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         } // end of digitsOn();
 
-    (function init() {
+        (function init() {
 
-        digitsOff();
+            digitsOff();
 
         // setup the web audio api
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        var context = new AudioContext();
-        var source = context.createMediaElementSource(document.getElementById('audio'));
-        var gainNode = context.createGain();
+        context = new AudioContext();
+        source = context.createMediaElementSource(document.getElementById('audio'));
+        gainNode = context.createGain();
 
-        var bassFilter = context.createBiquadFilter();
-            bassFilter.type = "lowshelf";
-        var trebFilter = context.createBiquadFilter();
-            trebFilter.type = "highshelf";
-        var panner = context.createPanner();
-            panner.panningModel = 'equalpower';
-            panner.distanceModel = 'inverse';
-            panner.refDistance = 1;
-            panner.maxDistance = 10000;
-            panner.rolloffFactor = 1;
-            panner.coneInnerAngle = 360;
-            panner.coneOuterAngle = 0;
-            panner.coneOuterGain = 0;
-            panner.setOrientation(1,0,0);
-        var listener = context.listener;
-            listener.setOrientation(0,0,-1,0,1,0);
+        bassFilter = context.createBiquadFilter();
+        bassFilter.type = "lowshelf";
+        trebFilter = context.createBiquadFilter();
+        trebFilter.type = "highshelf";
+        panner = context.createPanner();
+        panner.panningModel = 'equalpower';
+        panner.distanceModel = 'inverse';
+        panner.refDistance = 1;
+        panner.maxDistance = 10000;
+        panner.rolloffFactor = 1;
+        panner.coneInnerAngle = 360;
+        panner.coneOuterAngle = 0;
+        panner.coneOuterGain = 0;
+        panner.setOrientation(1,0,0);
+        listener = context.listener;
+        listener.setOrientation(0,0,-1,0,1,0);
+
+        gainNode.gain.value = currVolume;
 
         //push the FM stations into an array, and make a number
         (function pushFM() {
@@ -314,15 +313,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
             ////console.log("fmSelected: " + fmSelected);
         }
     } else {
-            allPresetLightsOff();
-            var n = parseInt(n, 10);
-            if (power === true && tapeMonitor[2] === true) {
-                digitsOn();
-                signalLightsOff();
-                signalLightsOn();
-            }
+        allPresetLightsOff();
+        var n = parseInt(n, 10);
+        if (power === true && tapeMonitor[2] === true) {
+            digitsOn();
+            signalLightsOff();
+            signalLightsOn();
+        }
 
-            function presetPlay() {
+        function presetPlay() {
                     ////console.log("fm: " + fm + " am: " + am);
                     if (functions[2] === true) {
                         currAMPreset = parseInt(a, 10);
@@ -341,44 +340,44 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
                 }
                 ////console.log("radioSwitch(a): " + a);
-            switch (a) {
-                case 0:
+                switch (a) {
+                    case 0:
                     document.getElementById("preset1").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 1:
+                    case 1:
                     document.getElementById("preset2").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 2:
+                    case 2:
                     document.getElementById("preset3").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 3:
+                    case 3:
                     document.getElementById("preset4").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 4:
+                    case 4:
                     document.getElementById("preset5").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 5:
+                    case 5:
                     document.getElementById("preset6").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 6:
+                    case 6:
                     document.getElementById("preset7").className = "glass-button-on";
                     presetPlay();
                     break;
-                case 7:
+                    case 7:
                     document.getElementById("preset8").className = "glass-button-on";
                     presetPlay();
                     break;
+                }
             }
         }
-    }
 
-    function presetFunctionality(e) {
+        function presetFunctionality(e) {
         ////console.log("e: " + e.currentTarget.id);
         var string = e.currentTarget.id;
         var num = parseInt(string.substr((string.length - 1), 1), 10);
@@ -425,33 +424,105 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }
 
+    function eq(){
+        console.log("eq");
+        if(toneDefeat){
+            console.log("toneDefeatOn");
+            bassFilter.gain.value = 0;
+            trebFilter.gain.value = 0;
+            document.getElementById("trebStatus").innerHTML = "trebFilter.gain.value: "+ trebFilter.gain.value;
+            document.getElementById("bassStatus").innerHTML = "bassFilter.gain.value: "+ bassFilter.gain.value;
+        } else if (!toneDefeat){
+            console.log("toneDefeatOff");
+            if(trebTurnover){
+                console.log("trebFilter.frequency.value = 2000");
+                trebFilter.frequency.value = 2000;
+                if(loudness){
+                    trebFilter.gain.value = 5;
+                    currTrebFiltGain = trebFilter.gain.value;
+                } else {
+                    trebFilter.gain.value = 2;
+                    currTrebFiltGain = trebFilter.gain.value;
+                }
+                document.getElementById("trebStatus").innerHTML = "trebFilter.frequency.value: "+ trebFilter.frequency.value;
+            } else if(!trebTurnover){
+                console.log("trebFilter.frequency.value = 6000");
+                trebFilter.frequency.value = 6000;
+                if(loudness){
+                    trebFilter.gain.value = 9;
+                    currTrebFiltGain = trebFilter.gain.value;
+                } else {
+                    trebFilter.gain.value = 6;
+                    currTrebFiltGain = trebFilter.gain.value;
+                }
+                document.getElementById("trebStatus").innerHTML = "trebFilter.frequency.value: "+ trebFilter.frequency.value;
+            }
 
+            if(bassTurnover){
+                console.log("bassFilter.frequency.value = 200");
+                bassFilter.frequency.value = 200;
+                if(loudness){
+                    bassFilter.gain.value = 5;
+                    currBassFiltGain = bassFilter.gain.value;
+                } else {
+                    bassFilter.gain.value = 2;
+                    currBassFiltGain = bassFilter.gain.value;
+                }
+                document.getElementById("bassStatus").innerHTML = "bassFilter.frequency.value: "+ bassFilter.frequency.value;
+            } else if(!bassTurnover){
+                console.log("bassFilter.frequency.value = 400");
+                bassFilter.frequency.value = 400;
+                if(loudness){
+                    bassFilter.gain.value = 9;
+                    currBassFiltGain = bassFilter.gain.value;
+                } else {
+                    bassFilter.gain.value = 6;
+                    currBassFiltGain = bassFilter.gain.value;
+                }
+                document.getElementById("bassStatus").innerHTML = "bassFilter.frequency.value: "+ bassFilter.frequency.value;
+            }
+        }
+        if(mute){
+            gainNode.gain.value = 0;
+            lastVolume = currVolume;
+        } else {
+            gainNode.gain.value = lastVolume;
+        }
+        document.getElementById("toneStatus").innerHTML = "Tone Defeat: "+ toneDefeat;
+        document.getElementById("loudnessStatus").innerHTML = "Loudness: "+loudness;
+        document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;
+    }
 
-    function audioPlay(url) {
-            audio.src = url;
-            audio.load();
-            audio.play();
-            signalLightsOn();
-            source.connect(context.destination);
-        } //end of play();¸
+    function audioPlay(url){
+        audio.src = url;
+        audio.load();
+        audio.play();
+        signalLightsOn();
+        source.connect(panner);
+        panner.connect(gainNode);
+        gainNode.connect(bassFilter);
+        bassFilter.connect(trebFilter);
+        trebFilter.connect(context.destination);
+        eq();
+    } //end of play();¸
 
-    function audioStop(url) {
+        function audioStop(url) {
             audio.pause();
             audio.src = '';
             signalLightsOff();
         } //end of play();¸
 
-    function signal() {
-        if (fm) {
-            signalType = "fm";
-        } else {
-            signalType = "am";
+        function signal() {
+            if (fm) {
+                signalType = "fm";
+            } else {
+                signalType = "am";
+            }
+            return signal;
         }
-        return signal;
-    }
 
 
-    function radioDisplay(callNum, signal) {
+        function radioDisplay(callNum, signal) {
 
             currCallNum = String(callNum);
 
@@ -545,7 +616,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         } // end of Radio Display
 
-    function functionButton(e) {
+        function functionButton(e) {
         //////console.log("e.currentTarget.id: "+e.currentTarget.id);
         var buttonOn = document.getElementById(e.currentTarget.id);
         for (i = 1; i < 5; i++) {
@@ -568,7 +639,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 break;
 
-            case "func-2":
+                case "func-2":
                 ////console.log("aux selected");
                 functions[1] = true;
                 if (power === true && tapeMonitor[2] === true) {
@@ -580,7 +651,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 break;
 
-            case "func-3":
+                case "func-3":
                 ////console.log("am selected");
                 functions[2] = true;
                 am = true;
@@ -603,7 +674,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 break;
 
-            case "func-4":
+                case "func-4":
                 ////console.log("fm selected");
                 functions[3] = true;
                 am = false;
@@ -625,7 +696,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 }
                 break;
-        }
+            }
 
         ////console.log("functions: " + functions);
     }
@@ -652,7 +723,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 allPresetLightsOff();
                 break;
 
-            case "tm-2":
+                case "tm-2":
                 ////console.log("Tape 2 selected");
                 tapeMonitor[1] = true;
                 audioStop();
@@ -662,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 allPresetLightsOff();
                 break;
 
-            case "tm-3":
+                case "tm-3":
                 ////console.log("Source selected");
                 ////console.log("functions: " + functions);
                 tapeMonitor[2] = true;
@@ -703,7 +774,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     signalLightsOn();
                 }
                 break;
-        }
+            }
         //////console.log("functions: "+ functions);
     }
 
@@ -801,7 +872,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         clearInterval(autoSearchUp);
                     }
                 }, 100);
-            } else {
+} else {
                 ////console.log("AUTO: an AM preset HAS NOT been selected");
                 var amAutoSearchWOPUp = setInterval(function() {
                     amCallNum += 10;
@@ -898,7 +969,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         clearInterval(fmAutoSearchUp);
                     }
                 }, 100);
-            } else {
+} else {
                 //console.log("AUTO: an FM preset HAS NOT been selected");
                 //console.log("fmCallNum: " + fmCallNum);
                 //a preset HAS NOT been selected, start at the first call number
@@ -946,13 +1017,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         clearInterval(fmAutoSearchWOPUp);
                     }
                 }, 100);
-            }
-        }
-    }
+}
+}
+}
 
-    function autoDown() {
-            audioStop();
-            if (functions[2] === true) {
+function autoDown() {
+    audioStop();
+    if (functions[2] === true) {
                 ////console.log("AUTO: its in AM mode");
                 if (currAMCallNum !== undefined) {
                     ////console.log("AUTO: an AM preset HAS been selected");
@@ -998,7 +1069,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             clearInterval(autoSearchDown);
                         }
                     }, 100);
-                } else {
+} else {
                     ////console.log("AUTO: an AM preset HAS NOT been selected");
                     var autoSearchUp = setInterval(function() {
                         amCallNum -= 10;
@@ -1101,17 +1172,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             clearInterval(fmAutoSearchUp);
                         }
                     }, 100);
-                } else {
-                    console.log("AUTO: an FM preset HAS NOT been selected");
-                    var fmAutoSearchNPDown = setInterval(function() {
-                        fmCallNum -= 1;
-                        var tempFMCallNum;
-                        if (fmCallNum > 879) {
-                            for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                                console.log("typeof amCallNum: "+ typeof amCallNum);
-                                console.log("amCallNum: "+ amCallNum);
-                                console.log("amCallNum.length: "+ amCallNum.length);
-                                var stupid = String(fmCallNum);
+} else {
+    console.log("AUTO: an FM preset HAS NOT been selected");
+    var fmAutoSearchNPDown = setInterval(function() {
+        fmCallNum -= 1;
+        var tempFMCallNum;
+        if (fmCallNum > 879) {
+            for (i = 0; i < fmCallNumbers.length - 1; i++) {
+                console.log("typeof amCallNum: "+ typeof amCallNum);
+                console.log("amCallNum: "+ amCallNum);
+                console.log("amCallNum.length: "+ amCallNum.length);
+                var stupid = String(fmCallNum);
                                 //console.log("stupid: " + stupid);
                                 //console.log("stupid.length: " + stupid.length);
                                 if (stupid.length === 4) {
@@ -1158,9 +1229,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } // end of autoUp();
 
 
-    /*--- up tuner button functionality --*/
-    var tunerUp = document.getElementById("up-button");
-    tunerUp.addEventListener("click", function(event) {
+        /*--- up tuner button functionality --*/
+        var tunerUp = document.getElementById("up-button");
+        tunerUp.addEventListener("click", function(event) {
         ////console.log("tuner up");
 
         ////console.log("typeof amCallNum: "+ typeof amCallNum);
@@ -1268,13 +1339,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }, false);
 
-    /* --- down tuner button functionality --*/
-    var tunerDown = document.getElementById("down-button");
-    tunerDown.addEventListener("click", function(event) {
-        console.log("tuner down");
+/* --- down tuner button functionality --*/
+var tunerDown = document.getElementById("down-button");
+tunerDown.addEventListener("click", function(event) {
+    console.log("tuner down");
 
-        if (autoManual === false) {
-            autoDown();
+    if (autoManual === false) {
+        autoDown();
             ////console.log("autoTuner");
         } else {
             ////console.log("Manual Tuner");
@@ -1377,16 +1448,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }, false);
 
-    
 
-    var bassTurnoverBut = document.getElementById("bass-turnover-button");
-    bassTurnoverBut.addEventListener("click", function(event) {
-        bassTurnover = !bassTurnover;
-        if(bassTurnover){
-            bassTurnoverBut.className = "square-button-down";
-            if(bassTurnoverFilter !== undefined){
-                bassTurnoverFilter.disconnect();
-            }
+
+var bassTurnoverBut = document.getElementById("bass-turnover-button");
+bassTurnoverBut.addEventListener("click", function(event) {
+    bassTurnover = !bassTurnover;
+    if(bassTurnover){
+        bassTurnoverBut.className = "square-button-down";
+        if(bassTurnoverFilter !== undefined){
+            bassTurnoverFilter.disconnect();
+        }
             source.connect(bassTurnoverFilter); //and of course connect it
             bassTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
             bassTurnoverFilter.frequency.value = 200; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
@@ -1411,25 +1482,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
         //filter.frequency.linearRampToValueAtTime(120.0, context.currentTime+10);
     }, false);
 
-    var toneDefeatBut = document.getElementById("tone-defeat-button");
-    toneDefeatBut.addEventListener("click", function(event) {
-        toneDefeat = !toneDefeat;
-        if(toneDefeat){
-            toneDefeatBut.className = "square-button-down";
-        } else {
-            toneDefeatBut.className = "square-button-up";
+var toneDefeatBut = document.getElementById("tone-defeat-button");
+toneDefeatBut.addEventListener("click", function(event) {
+    toneDefeat = !toneDefeat;
+    if(toneDefeat){
+        toneDefeatBut.className = "square-button-down";
+    } else {
+        toneDefeatBut.className = "square-button-up";
+    }
+
+}, false);
+
+var trebleTurnoverBut = document.getElementById("treble-turnover-button");
+trebleTurnoverBut.addEventListener("click", function(event) {
+    trebleTurnover = !trebleTurnover;
+    if(trebleTurnover){
+        trebleTurnoverBut.className = "square-button-down";
+        if(trebleTurnoverFilter !== undefined){
+            trebleTurnoverFilter.disconnect();
         }
-
-    }, false);
-
-    var trebleTurnoverBut = document.getElementById("treble-turnover-button");
-    trebleTurnoverBut.addEventListener("click", function(event) {
-        trebleTurnover = !trebleTurnover;
-        if(trebleTurnover){
-            trebleTurnoverBut.className = "square-button-down";
-            if(trebleTurnoverFilter !== undefined){
-                trebleTurnoverFilter.disconnect();
-            }
             source.connect(trebleTurnoverFilter); //and of course connect it
             trebleTurnoverFilter.type = "lowpass"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
             trebleTurnoverFilter.frequency.value = 2000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
@@ -1450,62 +1521,62 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }, false);
 
 
-    var speaker1But = document.getElementById("speaker1");
-        speaker1But.addEventListener("click", function(event) {
-            speaker1 = !speaker1;
-            if(speaker1){
-                speaker1But.className = "square-button-down";
-                source.connect(context.destination);
-            } else {
-                speaker1But.className = "square-button-up";
-                source.disconnect(context.destination);
-            }
-    }, false);
+var speaker1But = document.getElementById("speaker1");
+speaker1But.addEventListener("click", function(event) {
+    speaker1 = !speaker1;
+    if(speaker1){
+        speaker1But.className = "square-button-down";
+        source.connect(context.destination);
+    } else {
+        speaker1But.className = "square-button-up";
+        source.disconnect(context.destination);
+    }
+}, false);
 
-    var speaker2But = document.getElementById("speaker2");
-        speaker2But.addEventListener("click", function(event) {
-            speaker2 = !speaker2;
-            if(speaker2){
-                speaker2But.className = "square-button-down";
+var speaker2But = document.getElementById("speaker2");
+speaker2But.addEventListener("click", function(event) {
+    speaker2 = !speaker2;
+    if(speaker2){
+        speaker2But.className = "square-button-down";
                 //source.connect(context.destination);
             } else {
                 speaker2But.className = "square-button-up";
                 //source.disconnect(context.destination);
             }
-    }, false);
+        }, false);
 
-    var tapeCopyBut = document.getElementById("tape-copy-button");
-        tapeCopyBut.addEventListener("click", function(event) {
-            tapeCopy = !tapeCopy;
-            if(tapeCopy){
-                tapeCopyBut.className = "square-button-down";
+var tapeCopyBut = document.getElementById("tape-copy-button");
+tapeCopyBut.addEventListener("click", function(event) {
+    tapeCopy = !tapeCopy;
+    if(tapeCopy){
+        tapeCopyBut.className = "square-button-down";
                 //source.connect(context.destination);
             } else {
                 tapeCopyBut.className = "square-button-up";
                 //source.disconnect(context.destination);
             }
-    }, false);
+        }, false);
 
-    var subSonicBut = document.getElementById("supsonic-filter-button");
-        subSonicBut.addEventListener("click", function(event) {
-            subSonic = !subSonic;
-            if(subSonic){
-                subSonicBut.className = "square-button-down";
+var subSonicBut = document.getElementById("supsonic-filter-button");
+subSonicBut.addEventListener("click", function(event) {
+    subSonic = !subSonic;
+    if(subSonic){
+        subSonicBut.className = "square-button-down";
                 //source.connect(context.destination);
             } else {
                 subSonicBut.className = "square-button-up";
                 //source.disconnect(context.destination);
             }
-    }, false);
+        }, false);
 
-    var loudnessBut = document.getElementById("loudness-button");
-        loudnessBut.addEventListener("click", function(event) {
-            loudness = !loudness;
-            if(loudness){
-                loudnessBut.className = "square-button-down";
-                if(loudnessTrebFilter !== undefined){
-                    loudnessTrebFilter.disconnect();
-                }
+var loudnessBut = document.getElementById("loudness-button");
+loudnessBut.addEventListener("click", function(event) {
+    loudness = !loudness;
+    if(loudness){
+        loudnessBut.className = "square-button-down";
+        if(loudnessTrebFilter !== undefined){
+            loudnessTrebFilter.disconnect();
+        }
                 source.connect(loudnessTrebFilter); //and of course connect it
                 loudnessTrebFilter.type = "highshelf"; //this is a lowshelffilter (try excuting filter1.LOWSHELF in your console)
                 loudnessTrebFilter.frequency.value = 6000; //as this is a lowshelf filter, it strongens all sounds beneath this frequency
@@ -1533,92 +1604,92 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 source.connect(context.destination);
             }
-    }, false);
+        }, false);
 
 
- /* --- down tuner button functionality --*/
-    var memoryButton = document.getElementById("memory-button");
-    memoryButton.addEventListener("click", function(event) {
+/* --- down tuner button functionality --*/
+var memoryButton = document.getElementById("memory-button");
+memoryButton.addEventListener("click", function(event) {
+    memory = !memory;
+    if(memory){
+        document.getElementById("memory-button").className = "glass-button-on";
+    } else {
+        document.getElementById("memory-button").className = "glass-button-off";
+    }
+
+    setTimeout(function(){
         memory = !memory;
-        if(memory){
-            document.getElementById("memory-button").className = "glass-button-on";
-        } else {
-            document.getElementById("memory-button").className = "glass-button-off";
-        }
+        document.getElementById("memory-button").className = "glass-button-off";
+    },3000);
 
-        setTimeout(function(){
-            memory = !memory;
-            document.getElementById("memory-button").className = "glass-button-off";
-        },3000);
+}, false);
 
-    }, false);
+function powerOnDisplay() {
+    document.getElementById("glass-feature").className = "glass-uppercase-on";
+    document.getElementById("tape-monitor").className = "glass-uppercase-on";
+    document.getElementById("tape1-holder").className = "glass-lowercase-on";
+    document.getElementById("tape2-holder").className = "glass-lowercase-on";
+    document.getElementById("function-header").className = "glass-uppercase-on";
+    document.getElementById("function-header").className = "glass-uppercase-on function-header-on";
+    document.getElementById("phono-holder").className = "glass-lowercase-on";
+    document.getElementById("aux-holder").className = "glass-lowercase-on";
+    document.getElementById("am-holder").className = "glass-lowercase-on";
+    document.getElementById("fm-holder").className = "glass-lowercase-on";
+    document.getElementById("signal-header").className = "signal-header-on";
+    document.getElementById("signal-lights-holder").className = "glass-uppercase-off";
+    document.getElementById("signal-footer").className = "signal-footer-on";
+}
 
-    function powerOnDisplay() {
-        document.getElementById("glass-feature").className = "glass-uppercase-on";
-        document.getElementById("tape-monitor").className = "glass-uppercase-on";
-        document.getElementById("tape1-holder").className = "glass-lowercase-on";
-        document.getElementById("tape2-holder").className = "glass-lowercase-on";
-        document.getElementById("function-header").className = "glass-uppercase-on";
-        document.getElementById("function-header").className = "glass-uppercase-on function-header-on";
-        document.getElementById("phono-holder").className = "glass-lowercase-on";
-        document.getElementById("aux-holder").className = "glass-lowercase-on";
-        document.getElementById("am-holder").className = "glass-lowercase-on";
-        document.getElementById("fm-holder").className = "glass-lowercase-on";
-        document.getElementById("signal-header").className = "signal-header-on";
-        document.getElementById("signal-lights-holder").className = "glass-uppercase-off";
-        document.getElementById("signal-footer").className = "signal-footer-on";
+function powerOffDisplay() {
+    document.getElementById("glass-feature").className = "glass-uppercase-off";
+    document.getElementById("tape-monitor").className = "glass-uppercase-off";
+    document.getElementById("tape1-holder").className = "glass-lowercase-off";
+    document.getElementById("tape2-holder").className = "glass-lowercase-off";
+    document.getElementById("function-header").className = "glass-uppercase-off";
+    document.getElementById("function-header").className = "glass-uppercase-off function-header-off";
+    document.getElementById("phono-holder").className = "glass-lowercase-off";
+    document.getElementById("aux-holder").className = "glass-lowercase-off";
+    document.getElementById("am-holder").className = "glass-lowercase-off";
+    document.getElementById("fm-holder").className = "glass-lowercase-off";
+    document.getElementById("signal-header").className = "signal-header-off";
+    document.getElementById("signal-lights-holder").className = "glass-uppercase-off";
+    document.getElementById("signal-footer").className = "signal-footer-off";
+    for (i = 1; i < 5; i++) {
+        var funcButtonsOff = document.getElementById("function-light" + i);
+        funcButtonsOff.className = "function-light-off";
     }
-
-    function powerOffDisplay() {
-        document.getElementById("glass-feature").className = "glass-uppercase-off";
-        document.getElementById("tape-monitor").className = "glass-uppercase-off";
-        document.getElementById("tape1-holder").className = "glass-lowercase-off";
-        document.getElementById("tape2-holder").className = "glass-lowercase-off";
-        document.getElementById("function-header").className = "glass-uppercase-off";
-        document.getElementById("function-header").className = "glass-uppercase-off function-header-off";
-        document.getElementById("phono-holder").className = "glass-lowercase-off";
-        document.getElementById("aux-holder").className = "glass-lowercase-off";
-        document.getElementById("am-holder").className = "glass-lowercase-off";
-        document.getElementById("fm-holder").className = "glass-lowercase-off";
-        document.getElementById("signal-header").className = "signal-header-off";
-        document.getElementById("signal-lights-holder").className = "glass-uppercase-off";
-        document.getElementById("signal-footer").className = "signal-footer-off";
-        for (i = 1; i < 5; i++) {
-            var funcButtonsOff = document.getElementById("function-light" + i);
-            funcButtonsOff.className = "function-light-off";
-        }
-        for (i = 1; i < 3; i++) {
-            var tapeButtonsOff = document.getElementById("tape-light" + i);
-            tapeButtonsOff.className = "tape-light-off";
-        }
+    for (i = 1; i < 3; i++) {
+        var tapeButtonsOff = document.getElementById("tape-light" + i);
+        tapeButtonsOff.className = "tape-light-off";
     }
+}
 
 
-    /* ---- POWER BUTTON ---*/
-    document.getElementById("power-button").addEventListener("click", function() {
-        power = !power;
+/* ---- POWER BUTTON ---*/
+document.getElementById("power-button").addEventListener("click", function() {
+    power = !power;
 
-        if (power) {
-            if (tapeMonitor[0] === true) {
-                radioDisplay(amCallNum, signal);
-                digitsOff();
-            } else if (tapeMonitor[1] === true) {
-                radioDisplay(amCallNum, signal);
-                digitsOff();
-            }
-            if (functions[0] === true) {
-                radioDisplay(amCallNum, signal);
-                digitsOff();
-            } else if (functions[1] === true && tapeMonitor[2] === true) {
-                radioDisplay(amCallNum, signal);
-                digitsOff();
-            } else if (functions[2] === true && tapeMonitor[2] === true) {
-                radioDisplay(amCallNum, signal);
-                audioPlay(amUrl);
-            } else if (functions[3] === true && tapeMonitor[2] === true) {
-                radioDisplay(fmCallNum, signal);
-                audioPlay(fmUrl);
-            }
+    if (power) {
+        if (tapeMonitor[0] === true) {
+            radioDisplay(amCallNum, signal);
+            digitsOff();
+        } else if (tapeMonitor[1] === true) {
+            radioDisplay(amCallNum, signal);
+            digitsOff();
+        }
+        if (functions[0] === true) {
+            radioDisplay(amCallNum, signal);
+            digitsOff();
+        } else if (functions[1] === true && tapeMonitor[2] === true) {
+            radioDisplay(amCallNum, signal);
+            digitsOff();
+        } else if (functions[2] === true && tapeMonitor[2] === true) {
+            radioDisplay(amCallNum, signal);
+            audioPlay(amUrl);
+        } else if (functions[3] === true && tapeMonitor[2] === true) {
+            radioDisplay(fmCallNum, signal);
+            audioPlay(fmUrl);
+        }
             ////console.log("power: " + power);
             powerOnDisplay();
             gainNode.gain.value = volume;
@@ -1638,7 +1709,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /*for(i = 1; i < 9; i++){
               var el = document.getElementById("preset"+i);
               el.addEventListener("click", presetFunctionality(i));     
-    } //end of for loop*/
+          } //end of for loop*/
 
 
 
