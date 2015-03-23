@@ -4,6 +4,7 @@
  * Copyright (c) 2014 Michael LaRiviere (leaffan1984@gmail.com)
  * Licensed under the MIT license
  */
+
 document.addEventListener("DOMContentLoaded", function(event) {
 
     var power = false;
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currBassGain = 0;
     var currTrebGain = 0;
 
-    //web audio related:
+    // web audio api related:
     var context;
     var source;
     var bassFilter;
@@ -130,8 +131,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     };
 
     var fmCallNum = 881;
+    currFMCallNum = fmCallNum;
     var fmUrl = "http://indie.streamon.fm:8000/indie-48k.aac";
     var amCallNum = 540;
+    currAMCallNum = amCallNum;
     var amUrl = "http://tor680.akacast.akamaistream.net/7/941/86884/v1/rogers.akacast.akamaistream.net/tor680";
     //var url ="http://sc3.spacialnet.com:30430";
 
@@ -147,10 +150,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             document.getElementById("kHz").className = "tuner-blue-sm off";
         } // end of digitsOff();
     function digitsOn() {
-            digit1.style.backgroundPosition = numbersOff;
-            digit2.style.backgroundPosition = numbersOff;
-            digit3.style.backgroundPosition = numbersOff;
-            digit4.style.backgroundPosition = numbersOff;
             if (functions[3] === true) {
                 document.getElementById("decimal").className = "decimal-on";
                 document.getElementById("MHz").className = "tuner-blue-sm on";
@@ -387,7 +386,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         var presetEl = document.getElementById("preset" + i);
         //funcEl.addEventListener("click", functions(event)); 
         presetEl.addEventListener("click", function(event) {
-            presetFunctionality(event);
+            if(power){
+                presetFunctionality(event);
+            }
         }, false);
     } //end of for loop
 
@@ -426,13 +427,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function eq() {
         console.log("eq");
         if (toneDefeat) {
-            console.log("toneDefeatOn");
+            //console.log("toneDefeatOn");
             bassFilter.gain.value = 0;
             trebFilter.gain.value = 0;
         } else if (!toneDefeat) {
-            console.log("toneDefeatOff");
+            //console.log("toneDefeatOff");
             if (trebTurnover) {
-                console.log("trebFilter.frequency.value = 2000");
+                //console.log("trebFilter.frequency.value = 2000");
                 trebFilter.frequency.value = 2000;
                 if (loudness) {
                     trebFilter.gain.value = 5;
@@ -442,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     currTrebFiltGain = trebFilter.gain.value;
                 }
             } else if (!trebTurnover) {
-                console.log("trebFilter.frequency.value = 6000");
+                //console.log("trebFilter.frequency.value = 6000");
                 trebFilter.frequency.value = 6000;
                 if (loudness) {
                     trebFilter.gain.value = 9;
@@ -454,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
 
             if (bassTurnover) {
-                console.log("bassFilter.frequency.value = 200");
+                //console.log("bassFilter.frequency.value = 200");
                 bassFilter.frequency.value = 200;
                 if (loudness) {
                     bassFilter.gain.value = 5;
@@ -464,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     currBassFiltGain = bassFilter.gain.value;
                 }
             } else if (!bassTurnover) {
-                console.log("bassFilter.frequency.value = 400");
+                //console.log("bassFilter.frequency.value = 400");
                 bassFilter.frequency.value = 400;
                 if (loudness) {
                     bassFilter.gain.value = 9;
@@ -513,8 +514,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
     function radioDisplay(callNum, signal) {
-
             currCallNum = String(callNum);
+            console.log("callNum: "+ typeof currCallNum);
+
 
             if (currCallNum.length == 4) {
                 num4 = currCallNum.substr(3, 1);
@@ -528,9 +530,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 num1 = 0;
             }
 
-            ////console.log('num4: ' + num4 + ',\n num3: ' + num3 + ',\n num2: ' + num2 + ',\n num1: ' + num1);
+            console.log('num4: ' + num4 + ',\nnum3: ' + num3 + ',\nnum2: ' + num2 + ',\nnum1: ' + num1);
 
-            if (power) {
+            if (power){
+                console.log("power on: "+ power);
                 digit1.style.backgroundPosition = position[num1];
                 digit2.style.backgroundPosition = position[num2];
                 digit3.style.backgroundPosition = position[num3];
@@ -538,6 +541,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (currCallNum.length == 3) {
                     digit1.style.backgroundPosition = numbersOff;
                 }
+
+                console.log("digit4.style.backgroundPosition: "+ digit4.style.backgroundPosition);
+                console.log("digit3.style.backgroundPosition: "+ digit3.style.backgroundPosition);
+                console.log("digit4.style.backgroundPosition: "+ digit2.style.backgroundPosition);
+                console.log("digit5.style.backgroundPosition: "+ digit1.style.backgroundPosition);
 
                 for (i = 1; i < 5; i++) {
                     var funcButtonsOff = document.getElementById("function-light" + i);
@@ -647,8 +655,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 am = true;
                 fm = false;
                 if (power === true && tapeMonitor[2] === true) {
-                    digitsOn();
+                    
                     if (currAMCallNum !== undefined) {
+                        console.log("currAMCallNum: "+currAMCallNum);
                         radioDisplay(currAMCallNum, signal);
                         audioPlay(currAMURL);
                         allPresetLightsOff();
@@ -658,9 +667,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         audioPlay(amURLs[0]);
                         allPresetLightsOff();
                     }
-                    signalLightsOff();
+                    digitsOn();
+                    //signalLightsOff();
                     signalLightsOn();
-
                 }
                 break;
 
@@ -672,7 +681,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (power === true && tapeMonitor[2] === true) {
                     digitsOn();
                     if (currFMCallNum !== undefined) {
-                        radioDisplay(fmCallNum, signal);
+                        radioDisplay(currFMCallNum, signal);
                         audioPlay(fmUrl);
                         allPresetLightsOff();
                         radioPresetSwitch(currFMPreset);
@@ -681,13 +690,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         audioPlay(fmURLs[0]);
                         allPresetLightsOff();
                     }
-                    signalLightsOff();
+                    digitsOn();
+                    //signalLightsOff();
                     signalLightsOn();
-
                 }
                 break;
         }
-
         ////console.log("functions: " + functions);
     }
 
@@ -725,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             case "tm-3":
                 ////console.log("Source selected");
-                ////console.log("functions: " + functions);
+                console.log("functions: " + functions);
                 tapeMonitor[2] = true;
                 if (power === true && functions[0] === true) {
                     radioDisplay(amCallNum, signal);
@@ -734,32 +742,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     radioDisplay(amCallNum, signal);
                     digitsOff();
                 } else if (power === true && functions[2] === true) {
-                    digitsOn();
+                    
                     if (currAMCallNum !== undefined) {
                         radioDisplay(currAMCallNum, signal);
                         audioPlay(currAMURL);
                         allPresetLightsOff();
                         radioPresetSwitch(currAMPreset);
                     } else {
-                        radioDisplay(amCallNumbers[0], signal);
+                        radioDisplay(amCallNum, signal);
                         audioPlay(amURLs[0]);
                         allPresetLightsOff();
                     }
+                    digitsOn();
                     signalLightsOff();
                     signalLightsOn();
                 } else if (power === true && functions[3] === true) {
-                    ////console.log("power and function3");
-                    digitsOn();
+                    console.log("power and function3");
+                    
                     if (currFMCallNum !== undefined) {
-                        radioDisplay(fmCallNum, signal);
-                        audioPlay(fmUrl);
+                        radioDisplay(currFMCallNum, signal);
+                        audioPlay(currFMURL);
                         allPresetLightsOff();
                         radioPresetSwitch(currFMPreset);
                     } else {
-                        radioDisplay(fmCallNumbers[0], signal);
+                        radioDisplay(fmCallNum, signal);
                         audioPlay(fmURLs[0]);
                         allPresetLightsOff();
                     }
+                    digitsOn();
                     signalLightsOff();
                     signalLightsOn();
                 }
@@ -1476,13 +1486,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var speaker1But = document.getElementById("speaker1");
     speaker1But.addEventListener("click", function(event) {
         speaker1 = !speaker1;
-        if (speaker1) {
-            speaker1But.className = "square-button-down";
-            source.connect(context.destination);
-        } else {
-            speaker1But.className = "square-button-up";
-            source.disconnect(context.destination);
-        }
+        mute = !mute;
+            if (speaker1){
+                speaker1But.className = "square-button-down";
+            } else {
+                speaker1But.className = "square-button-up";
+            }
+            eq();
     }, false);
 
     var speaker2But = document.getElementById("speaker2");
@@ -1562,18 +1572,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* --- down tuner button functionality --*/
     var memoryButton = document.getElementById("memory-button");
     memoryButton.addEventListener("click", function(event) {
-        memory = !memory;
-        if (memory) {
-            document.getElementById("memory-button").className = "glass-button-on";
-        } else {
-            document.getElementById("memory-button").className = "glass-button-off";
-        }
-
-        setTimeout(function() {
+        if(power){
             memory = !memory;
-            document.getElementById("memory-button").className = "glass-button-off";
-        }, 3000);
-
+            if (memory) {
+                document.getElementById("memory-button").className = "glass-button-on";
+            } else {
+                document.getElementById("memory-button").className = "glass-button-off";
+            }
+            setTimeout(function() {
+                memory = !memory;
+                document.getElementById("memory-button").className = "glass-button-off";
+            }, 3000);
+        }
     }, false);
 
     function powerOnDisplay() {
@@ -1655,43 +1665,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }, false);
 
-
-
-
-    /*for(i = 1; i < 9; i++){
-              var el = document.getElementById("preset"+i);
-              el.addEventListener("click", presetFunctionality(i));     
-          } //end of for loop*/
-
-
-
-
-    ////console.log("currFMCallNum: " + currFMCallNum);
-
-    ////console.dir(audio);
-
-    var bassDial = JogDial(document.getElementById('bass-knob'), {
-        debug: false,
-        wheelSize: '90%',
-        zIndex: '100',
-        touchMode: 'wheel',
-        knobSize: '10%',
-        minDegree: -120,
-        maxDegree: 120,
-        degreeStartAt: 0
-    });
-
-    var trebleDial = JogDial(document.getElementById('treble-knob'), {
-        debug: false,
-        wheelSize: '90%',
-        zIndex: '100',
-        touchMode: 'wheel',
-        knobSize: '10%',
-        minDegree: -120,
-        maxDegree: 120,
-        degreeStartAt: 0
-    });
-
     // pan function for balance dial
     function pan(range) {
         var xDeg = parseInt(range,10);
@@ -1723,6 +1696,40 @@ document.addEventListener("DOMContentLoaded", function(event) {
         console.log("balance1: "+balance);
     });
 
+    var bassDial = JogDial(document.getElementById('bass-knob'), {
+        debug: false,
+        wheelSize: '90%',
+        zIndex: '100',
+        touchMode: 'wheel',
+        knobSize: '10%',
+        minDegree: -140,
+        maxDegree: 140,
+        degreeStartAt: 0
+    }).on("mousemove", function(event){
+        var bass = currBassFiltGain + (event.target.rotation + 140) / 280 * 10;
+        if(!toneDefeat){
+            bassFilter.gain.value = bass;
+        }
+        //document.getElementById("bassFilterGainStatus").innerHTML = "bassFilter.gain.value: "+bassFilter.gain.value;      
+    });
+
+    var trebleDial = JogDial(document.getElementById('treble-knob'), {
+        debug: false,
+        wheelSize: '90%',
+        zIndex: '100',
+        touchMode: 'wheel',
+        knobSize: '10%',
+        minDegree: -140,
+        maxDegree: 140,
+        degreeStartAt: 0
+    }).on("mousemove", function(event){
+        var treble = currTrebFiltGain + (event.target.rotation + 140) / 280 * 10;
+        if(!toneDefeat){
+            trebFilter.gain.value = treble;
+        }
+        //document.getElementById("trebFilterGainStatus").innerHTML = "trebNode.gain.value: "+trebFilter.gain.value;      
+    });
+
     var volumeDial = JogDial(document.getElementById('volume-knob'), {
         debug: false,
         wheelSize: '90%',
@@ -1732,16 +1739,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
-    }).on("mousemove", function(event) {
+    }).on("mousemove", function(event){
         var volume = (event.target.rotation + 140) / 280;
         gainNode.gain.value = volume;
-        source.disconnect();
-        source.connect(gainNode);
-        gainNode.connect(context.destination);
-    }).on("mouseup", function(event) {
+        //document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;      
+    }).on("mouseup", function(event){
         currVolume = volume;
     });
 
-
-    //volumeDial.angle(-140);
 }); // end of DOMContentLoaded

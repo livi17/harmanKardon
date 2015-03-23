@@ -1685,7 +1685,7 @@
 }
 #power-button,
 #bass-turnover-button,
-#treble-defeat-button,
+#tone-defeat-button,
 #treble-turnover-button,
 #speaker1,
 #speaker2,
@@ -1721,5 +1721,5 @@
 #balance-knob_wheel,
 #treble-knob_wheel,
 #bass-knob_wheel {
-  cursor: url('../img/rotate.png'), auto;
+  cursor: pointer;
 }
