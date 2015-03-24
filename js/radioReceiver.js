@@ -1568,7 +1568,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // tooltip messages
 
     document.getElementById("power-button").addEventListener("mouseover", function() {
-        status.innerHTML = "Power Swtche: Pressing this switch will turn on the power and the front panel will illuminate. Press the switch again to turn the power off";
+        status.innerHTML = "Power Switch: Pressing this switch will turn on the power and the front panel will illuminate. Press the switch again to turn the power off";
     }, false);
     document.getElementById("power-button").addEventListener("mouseout", function() {
         status.innerHTML = "";
