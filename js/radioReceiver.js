@@ -1,9 +1,11 @@
-/*
- * radioReceiver.js - v 1.0
- *
- * Copyright (c) 2014 Michael LaRiviere (leaffan1984@gmail.com)
- * Licensed under the MIT license
- */
+/********************************************************************
+ *                                                                  *
+ *   radioReceiver.js - v 1.0                                       *
+ *                                                                  *
+ *   Copyright (c) 2014 Michael LaRiviere (leaffan1984@gmail.com)   *
+ *   Licensed under the MIT license                                 *
+ *                                                                  *
+ *******************************************************************/
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -63,8 +65,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var currFMCallNum; // the current fm call station number
     var currFMURL; // the current fm url
 
-
-
+    var tempFMCallNum;
 
     var audio = document.getElementById('audio');
     var digit1 = document.getElementById('digit1');
@@ -210,17 +211,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 fmURLs.push(stations.fmStations[key]);
             }
         }());
-        //console.log("fmCallnumbers: " + fmCallNumbers);
 
         document.getElementById("speaker1").className = "square-button-down";
 
         //push the inital start FM station to the first station in the array
         fmCallNum = fmCallNumbers[0];
         currFMCallNum = fmCallNum;
-
-        ////console.log("typeof fmCallNumbers[2]: "+ typeof fmCallNumbers[2]);
-        ////console.log("fmCallNum "+ fmCallNum);
-        ////console.log("fmCallNum "+ typeof fmCallNum);
 
         //push the AM stations into an array, and make a number
         (function pushAM() {
@@ -229,25 +225,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 amURLs.push(stations.amStations[key]);
             }
         }());
-        //console.log("amCallnumbers: " + amCallNumbers);
 
         //push the inital start AM station to the first station in the array
         amCallNum = amCallNumbers[0];
         currAMCallNum = amCallNum;
 
-        ////console.log("typeof amCallNumbers[2]: "+ typeof amCallNumbers[2]);
-        ////console.log("amCallNum "+ amCallNum);
-        ////console.log("amCallNum "+ typeof amCallNum);
-
         var numOfFMStations = parseInt(fmCallNumbers.length, 10);
         var numOfAMStations = parseInt(amCallNumbers.length, 10);
-        ////console.log("numOfFMStations: " + numOfFMStations + "\nnumOfAMStations: " + numOfAMStations);
-        ////console.log("fmCallNumbers: " + fmCallNumbers + "\namCallNumbers: " + amCallNumbers);
-        ////console.log("fmURLs: " + fmURLs + "\nfmURLs: " + fmURLs);
 
         var randomnumber = Math.ceil(Math.random() * numOfFMStations - 1);
-        ////console.log("randomnumber: " + randomnumber);
-        ////console.log("fmSelected.length: " + fmSelected.length);
 
         /*------ pick 8 random preselected stations for am and fm on first power up ---- */
 
@@ -263,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             if (!found) fmSelected[fmSelected.length] = randomnumber1;
         }
         currFMURL = fmURLs[fmSelected[0]];
-        ////console.log("currFMURL: " + currFMURL);
 
         while (amSelected.length < 8) {
             var randomnumber2 = Math.ceil(Math.random() * numOfAMStations - 1);
@@ -277,10 +262,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             if (!found) amSelected[amSelected.length] = randomnumber2;
         }
         currAMURL = amURLs[amSelected[0]];
-        ////console.log("currAMURL: " + currAMURL);
-
-        ////console.log("fmSelected: " + fmSelected + "\namSelected: " + amSelected);
-
     })(); // end of init();
 
     function allPresetLightsOff() {
@@ -291,24 +272,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
     function radioPresetSwitch(a) {
-        //console.log("typeof a: "+ a);
-
         if (memory) {
-            //console.log("memory is on");
             if (am) {
-                ////console.log("amSelected: " + amSelected);
-                ////console.log("currAMCallNum:  " + currAMCallNum);
                 var AMTemp = amCallNumbers.indexOf(currAMCallNum);
                 amSelected[a] = AMTemp;
-
             } else if (fm) {
-                ////console.log("fmSelected: " + fmSelected);
-                ////console.log("currFMCallNum:  " + currFMCallNum);
-                ////console.log("fmCallNum:  " + fmCallNum);
                 var FMTemp = fmCallNumbers.indexOf(currFMCallNum);
-                ////console.log("FMTemp:  " + FMTemp);
                 fmSelected[a] = FMTemp;
-                ////console.log("fmSelected: " + fmSelected);
             }
         } else {
             allPresetLightsOff();
@@ -319,25 +289,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 signalLightsOn();
             }
 
-            function presetPlay() {
-                    ////console.log("fm: " + fm + " am: " + am);
-                    if (functions[2] === true) {
-                        currAMPreset = parseInt(a, 10);
-                        ////console.log("currAMPreset: " + currAMPreset);
-                        audioPlay(amURLs[amSelected[a]]);
-                        currAMCallNum = amCallNumbers[amSelected[a]];
-                        currAMURL = amURLs[amSelected[a]];
-                        radioDisplay(currAMCallNum, signal);
-                    } else if (functions[3] === true) {
-                        currFMPreset = parseInt(a, 10);
-                        ////console.log("currFMPreset: " + currFMPreset);
-                        audioPlay(fmURLs[fmSelected[a]]);
-                        currFMCallNum = fmCallNumbers[fmSelected[a]];
-                        currFMURL = fmURLs[fmSelected[a]];
-                        radioDisplay(currFMCallNum, signal);
-                    }
+            var presetPlay = function(){
+                if (functions[2] === true) {
+                    currAMPreset = parseInt(a, 10);
+                    audioPlay(amURLs[amSelected[a]]);
+                    currAMCallNum = amCallNumbers[amSelected[a]];
+                    currAMURL = amURLs[amSelected[a]];
+                    radioDisplay(currAMCallNum, signal);
+                } else if (functions[3] === true) {
+                    currFMPreset = parseInt(a, 10);
+                    audioPlay(fmURLs[fmSelected[a]]);
+                    currFMCallNum = fmCallNumbers[fmSelected[a]];
+                    currFMURL = fmURLs[fmSelected[a]];
+                    radioDisplay(currFMCallNum, signal);
                 }
-                ////console.log("radioSwitch(a): " + a);
+            };
+
             switch (a) {
                 case 0:
                     document.getElementById("preset1").className = "glass-button-on";
@@ -376,25 +343,35 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
     function presetFunctionality(e) {
-        ////console.log("e: " + e.currentTarget.id);
-        var string = e.currentTarget.id;
+        var string = e;
         var num = parseInt(string.substr((string.length - 1), 1), 10);
         radioPresetSwitch(num - 1);
     }
 
-    for (i = 1; i < 9; i++) {
+    /*for (i = 1; i < 9; i++) {
         var presetEl = document.getElementById("preset" + i);
-        //funcEl.addEventListener("click", functions(event)); 
         presetEl.addEventListener("click", function(event) {
-            if(power){
+            if (power) {
                 presetFunctionality(event);
             }
         }, false);
-    } //end of for loop
+    } //end of for loop*/
 
+    function presetClick(i) {
+        "use strict";
+        return function () {
+            if (power) {
+                presetFunctionality("preset"+i);
+            }
+        };
+    }
+
+    for (i = 1; i < 9; i++) {
+        var presetEl = document.getElementById("preset" + i);
+        presetEl.addEventListener("click", presetClick(i));
+    }
 
     function signalLightsOff() {
-        ////console.log("no signal tuned or power off");
         document.getElementById("signalstrength1").className = "signal-off";
         document.getElementById("signalstrength2").className = "signal-off";
         document.getElementById("signalstrength3").className = "signal-off";
@@ -408,7 +385,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function signalLightsOn(readyState) {
         if (power) {
             audio.oncanplay = function() {
-                ////console.log("signal tuned");
                 document.getElementById("signalstrength1").className = "signal-yellow";
                 document.getElementById("signalstrength2").className = "signal-yellow";
                 document.getElementById("signalstrength3").className = "signal-yellow";
@@ -425,15 +401,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
     function eq() {
-        console.log("eq");
         if (toneDefeat) {
-            //console.log("toneDefeatOn");
             bassFilter.gain.value = 0;
             trebFilter.gain.value = 0;
         } else if (!toneDefeat) {
-            //console.log("toneDefeatOff");
             if (trebTurnover) {
-                //console.log("trebFilter.frequency.value = 2000");
                 trebFilter.frequency.value = 2000;
                 if (loudness) {
                     trebFilter.gain.value = 5;
@@ -443,7 +415,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     currTrebFiltGain = trebFilter.gain.value;
                 }
             } else if (!trebTurnover) {
-                //console.log("trebFilter.frequency.value = 6000");
                 trebFilter.frequency.value = 6000;
                 if (loudness) {
                     trebFilter.gain.value = 9;
@@ -455,7 +426,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
 
             if (bassTurnover) {
-                //console.log("bassFilter.frequency.value = 200");
                 bassFilter.frequency.value = 200;
                 if (loudness) {
                     bassFilter.gain.value = 5;
@@ -465,7 +435,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     currBassFiltGain = bassFilter.gain.value;
                 }
             } else if (!bassTurnover) {
-                //console.log("bassFilter.frequency.value = 400");
                 bassFilter.frequency.value = 400;
                 if (loudness) {
                     bassFilter.gain.value = 9;
@@ -515,9 +484,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     function radioDisplay(callNum, signal) {
             currCallNum = String(callNum);
-            console.log("callNum: "+ typeof currCallNum);
-
-
             if (currCallNum.length == 4) {
                 num4 = currCallNum.substr(3, 1);
                 num3 = currCallNum.substr(2, 1);
@@ -530,10 +496,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 num1 = 0;
             }
 
-            console.log('num4: ' + num4 + ',\nnum3: ' + num3 + ',\nnum2: ' + num2 + ',\nnum1: ' + num1);
+            //console.log('num4: ' + num4 + ',\nnum3: ' + num3 + ',\nnum2: ' + num2 + ',\nnum1: ' + num1);
 
-            if (power){
-                console.log("power on: "+ power);
+            if (power) {
                 digit1.style.backgroundPosition = position[num1];
                 digit2.style.backgroundPosition = position[num2];
                 digit3.style.backgroundPosition = position[num3];
@@ -541,11 +506,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 if (currCallNum.length == 3) {
                     digit1.style.backgroundPosition = numbersOff;
                 }
-
-                console.log("digit4.style.backgroundPosition: "+ digit4.style.backgroundPosition);
-                console.log("digit3.style.backgroundPosition: "+ digit3.style.backgroundPosition);
-                console.log("digit4.style.backgroundPosition: "+ digit2.style.backgroundPosition);
-                console.log("digit5.style.backgroundPosition: "+ digit1.style.backgroundPosition);
 
                 for (i = 1; i < 5; i++) {
                     var funcButtonsOff = document.getElementById("function-light" + i);
@@ -615,8 +575,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } // end of Radio Display
 
     function functionButton(e) {
-        //////console.log("e.currentTarget.id: "+e.currentTarget.id);
-        var buttonOn = document.getElementById(e.currentTarget.id);
+        var buttonOn = document.getElementById(e);
         for (i = 1; i < 5; i++) {
             var buttonOff = document.getElementById("func-" + i);
             buttonOff.className = "vertical-button-off";
@@ -625,8 +584,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         buttonOn.className = "vertical-button-on";
         switch (buttonOn.id) {
             case "func-1":
-
-                ////console.log("phono selected");
                 functions[0] = true;
                 if (power === true && tapeMonitor[2] === true) {
                     radioDisplay(fmCallNum, signal);
@@ -638,7 +595,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 break;
 
             case "func-2":
-                ////console.log("aux selected");
                 functions[1] = true;
                 if (power === true && tapeMonitor[2] === true) {
                     radioDisplay(fmCallNum, signal);
@@ -650,14 +606,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 break;
 
             case "func-3":
-                ////console.log("am selected");
                 functions[2] = true;
                 am = true;
                 fm = false;
                 if (power === true && tapeMonitor[2] === true) {
-                    
                     if (currAMCallNum !== undefined) {
-                        console.log("currAMCallNum: "+currAMCallNum);
                         radioDisplay(currAMCallNum, signal);
                         audioPlay(currAMURL);
                         allPresetLightsOff();
@@ -668,13 +621,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         allPresetLightsOff();
                     }
                     digitsOn();
-                    //signalLightsOff();
+                    signalLightsOff();
                     signalLightsOn();
                 }
                 break;
 
             case "func-4":
-                ////console.log("fm selected");
                 functions[3] = true;
                 am = false;
                 fm = true;
@@ -696,11 +648,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 break;
         }
-        ////console.log("functions: " + functions);
     }
 
     function tapemonitorButton(a) {
-        var buttonOn = document.getElementById(a.currentTarget.id);
+        var buttonOn = document.getElementById(a);
         for (i = 1; i < 4; i++) {
             var buttonOff = document.getElementById("tm-" + i);
             buttonOff.className = "vertical-button-off";
@@ -712,7 +663,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         switch (buttonOn.id) {
             case "tm-1":
-                ////console.log("Tape 1 selected");
                 tapeMonitor[0] = true;
                 audioStop();
                 radioDisplay(fmCallNum, signal);
@@ -722,7 +672,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 break;
 
             case "tm-2":
-                ////console.log("Tape 2 selected");
                 tapeMonitor[1] = true;
                 audioStop();
                 radioDisplay(fmCallNum, signal);
@@ -732,8 +681,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 break;
 
             case "tm-3":
-                ////console.log("Source selected");
-                console.log("functions: " + functions);
                 tapeMonitor[2] = true;
                 if (power === true && functions[0] === true) {
                     radioDisplay(amCallNum, signal);
@@ -742,7 +689,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     radioDisplay(amCallNum, signal);
                     digitsOff();
                 } else if (power === true && functions[2] === true) {
-                    
+
                     if (currAMCallNum !== undefined) {
                         radioDisplay(currAMCallNum, signal);
                         audioPlay(currAMURL);
@@ -757,8 +704,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     signalLightsOff();
                     signalLightsOn();
                 } else if (power === true && functions[3] === true) {
-                    console.log("power and function3");
-                    
                     if (currFMCallNum !== undefined) {
                         radioDisplay(currFMCallNum, signal);
                         audioPlay(currFMURL);
@@ -775,37 +720,62 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
                 break;
         }
-        //////console.log("functions: "+ functions);
     }
 
-
-
     /* ---- FUNCTION BUTTONS ---*/
-    for (i = 1; i < 5; i++) {
+    /*for (i = 1; i < 5; i++) {
         var funcEl = document.getElementById("func-" + i);
         //funcEl.addEventListener("click", functions(event)); 
         funcEl.addEventListener("click", function(event) {
             functionButton(event);
         }, false);
-    } //end of for loop
+    } //end of for loop*/
+
+    /* ---- FUNCTION BUTTONS ---*/
+    function functionClick(i) {
+        "use strict";
+        return function () {
+            if (power) {
+                functionButton("func-" + i);
+            }
+        };
+    }
+
+    for (i = 1; i < 5; i++) {
+        var funcEl = document.getElementById("func-" + i);
+        funcEl.addEventListener("click", functionClick(i));
+    }
 
     /* ---- TAPE MONITOR BUTTONS ---*/
-    for (i = 1; i < 4; i++) {
+    /*for (i = 1; i < 4; i++) {
         var tmEl = document.getElementById("tm-" + i);
         //funcEl.addEventListener("click", functions(event)); 
         tmEl.addEventListener("click", function(event) {
             tapemonitorButton(event);
         }, false);
-    } //end of for loop
+    } //end of for loop*/
+
+    /* ---- TAPE MONITOR BUTTONS ---*/
+    function tapeClick(i) {
+        "use strict";
+        return function () {
+            if (power) {
+                tapemonitorButton("tm-" + i);
+            }
+        };
+    }
+
+    for (i = 1; i < 4; i++) {
+        var tmEl = document.getElementById("tm-" + i);
+        tmEl.addEventListener("click", tapeClick(i));
+    }
 
     /* ---- AUTO AND MANUAL TUNER BUTTONS ---*/
 
     var autoTuner = document.getElementById("auto-button");
     autoTuner.addEventListener("click", function(event) {
         if (power === true && tapeMonitor[2] === true && functions[2] === true || power === true && tapeMonitor[2] === true && functions[3] === true) {
-            ////console.log("autoTuner");
             autoManual = false;
-            ////console.log("autoManual: " + autoManual);
             autoTuner.className = "glass-button-on";
             manualTuner.className = "glass-button-off";
         }
@@ -814,9 +784,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var manualTuner = document.getElementById("manual-button");
     manualTuner.addEventListener("click", function(event) {
         if (power === true && tapeMonitor[2] === true && functions[2] === true || power === true && tapeMonitor[2] === true && functions[3] === true) {
-            ////console.log("manualTuner");
             autoManual = true;
-            ////console.log("autoManual: " + autoManual);
             autoTuner.className = "glass-button-off";
             manualTuner.className = "glass-button-on";
         }
@@ -826,27 +794,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function autoUp() {
         audioStop();
         if (functions[2] === true) {
-            //console.log("AUTO: its in AM mode");
             if (currAMCallNum !== undefined) {
-                //console.log("AUTO: an AM preset HAS been selected");
-
-                //console.log("currAMCallNum: " + typeof currAMCallNum);
                 var autoSearchUp = setInterval(function() {
                     currAMCallNum += 10;
                     if (currAMCallNum < 1601) {
                         for (i = 0; i < amCallNumbers.length - 1; i++) {
-                            ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                            ////console.log("amCallNum: "+ amCallNum);
-                            ////console.log("amCallNum.length: "+ amCallNum.length);
                             var stupid = String(currAMCallNum);
                             if (stupid > 999) {
-                                ////console.log("more than 999");
                                 num4 = stupid.substr(3, 1);
                                 num3 = stupid.substr(2, 1);
                                 num2 = stupid.substr(1, 1);
                                 num1 = stupid.substr(0, 1);
                             } else if (stupid < 1000) {
-                                ////console.log("< than 1000");
                                 num4 = stupid.substr(2, 1);
                                 num3 = stupid.substr(1, 1);
                                 num2 = stupid.substr(0, 1);
@@ -860,9 +819,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             } else {
                                 digit1.style.backgroundPosition = position[num1];
                             }
-                            ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                             if (currAMCallNum == amCallNumbers[i]) {
-                                //console.log("there is a match!!!");
                                 clearInterval(autoSearchUp);
                                 audioPlay(stations.amStations[currAMCallNum]);
                                 break;
@@ -873,23 +830,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
                 }, 100);
             } else {
-                ////console.log("AUTO: an AM preset HAS NOT been selected");
                 var amAutoSearchWOPUp = setInterval(function() {
                     amCallNum += 10;
                     if (amCallNum < 1601) {
                         for (i = 0; i < amCallNumbers.length - 1; i++) {
-                            ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                            ////console.log("amCallNum: "+ amCallNum);
-                            ////console.log("amCallNum.length: "+ amCallNum.length);
                             var stupid = String(amCallNum);
                             if (stupid > 999) {
-                                ////console.log("more than 999");
                                 num4 = stupid.substr(3, 1);
                                 num3 = stupid.substr(2, 1);
                                 num2 = stupid.substr(1, 1);
                                 num1 = stupid.substr(0, 1);
                             } else if (stupid < 1000) {
-                                ////console.log("< than 1000");
                                 num4 = stupid.substr(2, 1);
                                 num3 = stupid.substr(1, 1);
                                 num2 = stupid.substr(0, 1);
@@ -903,9 +854,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             } else {
                                 digit1.style.backgroundPosition = position[num1];
                             }
-                            ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                             if (amCallNum == amCallNumbers[i]) {
-                                ////console.log("there is a match!!!");
                                 clearInterval(amAutoSearchWOPUp);
                                 audioPlay(stations.amStations[amCallNum]);
                                 break;
@@ -917,31 +866,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }, 100);
             } //end of if
         } else {
-            //console.log("AUTO: its in FM mode");
             if (currFMCallNum !== undefined) {
-                //console.log("AUTO: an FM preset HAS been selected");
-                ////console.log("currFMCallNum: " + currFMCallNum);
-                //console.log("fmCallNum: " + fmCallNum);
-                //console.log("currFMCallNum: " + currFMCallNum);
-                //a preset HAS NOT been selected, start at the first call number
-                var tempFMCallNum;
                 var fmAutoSearchUp = setInterval(function() {
                     currFMCallNum += 1;
-
                     if (currFMCallNum < 1081) {
                         for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                            ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                            //console.log("currFMCallNum: " + currFMCallNum);
-                            ////console.log("amCallNum.length: "+ amCallNum.length);
                             var stupid = String(currFMCallNum);
                             if (stupid > 999) {
-                                ////console.log("more than 999");
                                 num4 = stupid.substr(3, 1);
                                 num3 = stupid.substr(2, 1);
                                 num2 = stupid.substr(1, 1);
                                 num1 = stupid.substr(0, 1);
                             } else if (stupid < 1000) {
-                                ////console.log("< than 1000");
                                 num4 = stupid.substr(2, 1);
                                 num3 = stupid.substr(1, 1);
                                 num2 = stupid.substr(0, 1);
@@ -955,11 +891,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             } else {
                                 digit1.style.backgroundPosition = position[num1];
                             }
-                            ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                             if (currFMCallNum == fmCallNumbers[i]) {
-                                //console.log("there is a match!!!" + currFMCallNum + " + " + fmCallNumbers[i]);
                                 tempFMCallNum = (currFMCallNum * 0.1).toFixed(1);
-                                //console.log("there is a match!!!" + tempFMCallNum + " + " + fmCallNumbers[i]);
                                 clearInterval(fmAutoSearchUp);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
                                 break;
@@ -970,26 +903,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
                 }, 100);
             } else {
-                //console.log("AUTO: an FM preset HAS NOT been selected");
-                //console.log("fmCallNum: " + fmCallNum);
-                //a preset HAS NOT been selected, start at the first call number
                 var fmAutoSearchWOPUp = setInterval(function() {
                     fmCallNum += 1;
-                    var tempFMCallNum;
                     if (fmCallNum < 1081) {
                         for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                            ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                            ////console.log("amCallNum: "+ amCallNum);
-                            ////console.log("amCallNum.length: "+ amCallNum.length);
                             var stupid = String(fmCallNum);
                             if (fmCallNum > 999) {
-                                ////console.log("more than 999");
                                 num4 = stupid.substr(3, 1);
                                 num3 = stupid.substr(2, 1);
                                 num2 = stupid.substr(1, 1);
                                 num1 = stupid.substr(0, 1);
                             } else if (fmCallNum < 1000) {
-                                ////console.log("< than 1000");
                                 num4 = stupid.substr(2, 1);
                                 num3 = stupid.substr(1, 1);
                                 num2 = stupid.substr(0, 1);
@@ -1003,11 +927,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             } else {
                                 digit1.style.backgroundPosition = position[num1];
                             }
-                            ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                             if (fmCallNum == fmCallNumbers[i]) {
-                                //console.log("there is a match!!!" + fmCallNum + " + " + fmCallNumbers[i]);
+
                                 tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
-                                //console.log("there is a match!!!" + tempFMCallNum + " + " + fmCallNumbers[i]);
+
                                 clearInterval(fmAutoSearchWOPUp);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
                                 break;
@@ -1024,26 +947,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function autoDown() {
             audioStop();
             if (functions[2] === true) {
-                ////console.log("AUTO: its in AM mode");
+                // AUTO: its in AM mode
                 if (currAMCallNum !== undefined) {
-                    ////console.log("AUTO: an AM preset HAS been selected");
-                    //console.log("currAMCallNum: " + typeof currAMCallNum);
+                    //AUTO: an AM preset HAS been selected
                     var autoSearchDown = setInterval(function() {
                         currAMCallNum -= 10;
                         if (currAMCallNum > 539) {
                             for (i = 0; i < amCallNumbers.length - 1; i++) {
-                                ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                                ////console.log("amCallNum: "+ amCallNum);
-                                ////console.log("amCallNum.length: "+ amCallNum.length);
                                 var stupid = String(currAMCallNum);
                                 if (stupid > 999) {
-                                    ////console.log("more than 999");
                                     num4 = stupid.substr(3, 1);
                                     num3 = stupid.substr(2, 1);
                                     num2 = stupid.substr(1, 1);
                                     num1 = stupid.substr(0, 1);
                                 } else if (stupid < 1000) {
-                                    ////console.log("< than 1000");
                                     num4 = stupid.substr(2, 1);
                                     num3 = stupid.substr(1, 1);
                                     num2 = stupid.substr(0, 1);
@@ -1057,9 +974,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 } else {
                                     digit1.style.backgroundPosition = position[num1];
                                 }
-                                ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                                 if (currAMCallNum == amCallNumbers[i]) {
-                                    //console.log("there is a match!!!");
                                     clearInterval(autoSearchDown);
                                     audioPlay(stations.amStations[currAMCallNum]);
                                     break;
@@ -1070,23 +985,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }
                     }, 100);
                 } else {
-                    ////console.log("AUTO: an AM preset HAS NOT been selected");
+                    //AUTO: an AM preset HAS NOT been selected
                     var autoSearchUp = setInterval(function() {
                         amCallNum -= 10;
                         if (amCallNum > 539) {
                             for (i = 0; i < amCallNumbers.length - 1; i++) {
-                                ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                                ////console.log("amCallNum: "+ amCallNum);
-                                ////console.log("amCallNum.length: "+ amCallNum.length);
                                 var stupid = String(amCallNum);
                                 if (stupid > 999) {
-                                    ////console.log("more than 999");
                                     num4 = stupid.substr(3, 1);
                                     num3 = stupid.substr(2, 1);
                                     num2 = stupid.substr(1, 1);
                                     num1 = stupid.substr(0, 1);
                                 } else if (stupid < 1000) {
-                                    ////console.log("< than 1000");
                                     num4 = stupid.substr(2, 1);
                                     num3 = stupid.substr(1, 1);
                                     num2 = stupid.substr(0, 1);
@@ -1100,9 +1010,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 } else {
                                     digit1.style.backgroundPosition = position[num1];
                                 }
-                                ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
                                 if (amCallNum == amCallNumbers[i]) {
-                                    ////console.log("there is a match!!!");
                                     clearInterval(autoSearchUp);
                                     audioPlay(stations.amStations[amCallNum]);
                                     break;
@@ -1115,31 +1023,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }, 100);
                 } //end of if
             } else {
-                console.log("AUTO: its in FM mode");
-                console.log("currFMCallNum: " + currFMCallNum);
+                //AUTO: its in FM mode
                 if (currFMCallNum !== undefined) {
-                    console.log("AUTO: an FM preset HAS been selected");
-                    //console.log("fmCallNum: " + fmCallNum);
-                    //console.log("currFMCallNum: " + currFMCallNum);
+                    //AUTO: an FM preset HAS been selected
                     //a preset HAS NOT been selected, start at the first call number
-                    var tempFMCallNum;
                     var fmAutoSearchUp = setInterval(function() {
                         currFMCallNum -= 1;
 
                         if (currFMCallNum < 1081) {
                             for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                                ////console.log("typeof amCallNum: "+ typeof amCallNum);
-                                //console.log("currFMCallNum: " + currFMCallNum);
-                                ////console.log("amCallNum.length: "+ amCallNum.length);
                                 var stupid = String(currFMCallNum);
                                 if (stupid > 999) {
-                                    ////console.log("more than 999");
                                     num4 = stupid.substr(3, 1);
                                     num3 = stupid.substr(2, 1);
                                     num2 = stupid.substr(1, 1);
                                     num1 = stupid.substr(0, 1);
                                 } else if (stupid < 1000) {
-                                    ////console.log("less than 1000");
                                     num4 = stupid.substr(2, 1);
                                     num3 = stupid.substr(1, 1);
                                     num2 = stupid.substr(0, 1);
@@ -1149,17 +1048,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 digit3.style.backgroundPosition = position[num3];
                                 digit4.style.backgroundPosition = position[num4];
                                 if (stupid < 1000) {
-                                    //console.log("less than 1000: " + digit1.style.backgroundPosition);
                                     digit1.style.backgroundPosition = numbersOff;
-                                    //console.log("less than 1000 b: " + digit1.style.backgroundPosition);
                                 } else {
                                     //console.log("more than 999");
                                 }
-                                ////console.log("amCallNumC: "+ amCallNum + " amCallNumbers[i]: "+ amCallNumbers[i]);
+
                                 if (currFMCallNum == fmCallNumbers[i]) {
-                                    //console.log("there is a match!!!" + currFMCallNum + " + " + fmCallNumbers[i]);
+
                                     tempFMCallNum = (currFMCallNum * 0.1).toFixed(1);
-                                    //console.log("there is a match!!!" + tempFMCallNum + " + " + fmCallNumbers[i]);
+
                                     clearInterval(fmAutoSearchUp);
                                     audioPlay(stations.fmStations[tempFMCallNum]);
                                     break;
@@ -1173,26 +1070,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }
                     }, 100);
                 } else {
-                    console.log("AUTO: an FM preset HAS NOT been selected");
+                    //AUTO: an FM preset HAS NOT been selected
                     var fmAutoSearchNPDown = setInterval(function() {
                         fmCallNum -= 1;
-                        var tempFMCallNum;
                         if (fmCallNum > 879) {
                             for (i = 0; i < fmCallNumbers.length - 1; i++) {
-                                console.log("typeof amCallNum: " + typeof amCallNum);
-                                console.log("amCallNum: " + amCallNum);
-                                console.log("amCallNum.length: " + amCallNum.length);
                                 var stupid = String(fmCallNum);
-                                //console.log("stupid: " + stupid);
-                                //console.log("stupid.length: " + stupid.length);
                                 if (stupid.length === 4) {
-                                    //console.log("stupid.length == 4");
                                     num4 = stupid.substr(3, 1);
                                     num3 = stupid.substr(2, 1);
                                     num2 = stupid.substr(1, 1);
                                     num1 = stupid.substr(0, 1);
                                 } else if (stupid.length === 3) {
-                                    //console.log("stupid.length == 3");
                                     num4 = stupid.substr(2, 1);
                                     num3 = stupid.substr(1, 1);
                                     num2 = stupid.substr(0, 1);
@@ -1207,9 +1096,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 } else {
                                     digit1.style.backgroundPosition = position[num1];
                                 }
-
-
-                                console.log("fmCallNum: " + fmCallNum);
                                 if (fmCallNum == fmCallNumbers[i]) {
                                     tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
                                     clearInterval(fmAutoSearchNPDown);
@@ -1232,23 +1118,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /*--- up tuner button functionality --*/
     var tunerUp = document.getElementById("up-button");
     tunerUp.addEventListener("click", function(event) {
-        ////console.log("tuner up");
-
-        ////console.log("typeof amCallNum: "+ typeof amCallNum);
-        ////console.log("typeof currAMCallNum: "+ typeof currAMCallNum);
-
         if (autoManual === false) {
             autoUp();
-            ////console.log("autoTuner");
         } else {
-            //console.log("Manual Tuner");
             // manual tuner selected
             if (functions[2] === true) {
-                //console.log("its in AM mode");
                 //its in AM mode
                 if (currAMCallNum !== undefined) {
                     ////console.log("a preset HAS been selected");
-                    ////console.log("currAMCallNum: " + currAMCallNum);
                     //a preset HAS been selected, start at that preset call number
                     if (currAMCallNum > 539 && currAMCallNum < 1601) {
                         audioStop();
@@ -1257,78 +1134,57 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         for (i = 0; i < amCallNumbers.length; i++) {
                             if (currAMCallNum == amCallNumbers[i]) {
                                 radioDisplay(currAMCallNum, signal);
-                                ////console.log("there is a match!!!");
-                                radioDisplay(currAMCallNum, signal);
                                 audioPlay(stations.amStations[currAMCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
                         radioDisplay(currAMCallNum, signal);
-                        ////console.log("typeof currAMCallNum: " + typeof currAMCallNum);
                     }
 
                 } else {
                     //a preset HAS NOT been selected, start at the first call number
                     //console.log("a preset HAS NOT been selected");
-                    ////console.log("amCallNum: "+amCallNum);
                     if (amCallNum > 539 && amCallNum < 1601) {
                         audioStop();
                         amCallNum += 10;
-                        //console.log("amCallNum: " + amCallNum);
                         for (i = 0; i < amCallNumbers.length; i++) {
                             if (amCallNum == amCallNumbers[i]) {
-                                ////console.log("there is a match!!!");
                                 radioDisplay(amCallNum, signal);
                                 audioPlay(stations.amStations[amCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
-                        ////console.log("amCallNum: " + amCallNum);
                         radioDisplay(amCallNum, signal);
                     }
                 }
             } else {
-                ////console.log("(this works) typeof currFMCallNum: "+typeof currFMCallNum);
                 //its in FM mode
                 if (currFMCallNum !== undefined) {
                     //a preset HAS been selected, start at that preset call number
                     //console.log("currFMCallNum: " + currFMCallNum);
-                    var tempFMCallNum;
                     if (currFMCallNum > 879 && currFMCallNum < 1081) {
                         audioStop();
                         currFMCallNum = (currFMCallNum + 1);
                         tempFMCallNum = (currFMCallNum * 0.1).toFixed(1);
                         for (i = 0; i < fmCallNumbers.length; i++) {
                             if (currFMCallNum == fmCallNumbers[i]) {
-                                //console.log("currFMCallNum: " + currFMCallNum);
-                                //console.log("tempFMCallNum: " + tempFMCallNum);
-                                //console.log("there is a match!!!");
                                 radioDisplay(currFMCallNum, signal);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
                         radioDisplay(currFMCallNum, signal);
                     }
                 } else {
-                    //console.log("fmCallNum: " + typeof fmCallNum);
-                    //console.log("fmCallNum: " + fmCallNum);
                     //a preset HAS NOT been selected, start at the first call number
-                    var tempFMCallNum2;
                     if (fmCallNum > 879 && fmCallNum < 1081) {
                         audioStop();
                         fmCallNum += 1;
-                        //console.log("fmCallNum: " + typeof fmCallNum);
                         for (i = 0; i < fmCallNumbers.length; i++) {
                             if (fmCallNum === fmCallNumbers[i]) {
-                                tempFMCallNum2 = (fmCallNum * 0.1).toFixed(1);
-                                //console.log("there is a match!!!");
+                                tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
                                 radioDisplay(fmCallNum, signal);
-                                audioPlay(stations.fmStations[tempFMCallNum2]);
-                                ////console.log("audio.src: " + audio.src);
+                                audioPlay(stations.fmStations[tempFMCallNum]);
                                 break;
                             }
                         }
@@ -1342,8 +1198,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* --- down tuner button functionality --*/
     var tunerDown = document.getElementById("down-button");
     tunerDown.addEventListener("click", function(event) {
-        console.log("tuner down");
-
         if (autoManual === false) {
             autoDown();
             ////console.log("autoTuner");
@@ -1355,7 +1209,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 //its in AM mode
                 if (currAMCallNum !== undefined) {
                     ////console.log("a preset HAS been selected");
-                    ////console.log("currAMCallNum: " + currAMCallNum);
                     //a preset HAS been selected, start at that preset call number
                     if (currAMCallNum > 539 && currAMCallNum < 1601) {
                         audioStop();
@@ -1363,10 +1216,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         currAMCallNum = (currAMCallNum - 10);
                         for (i = 0; i < amCallNumbers.length; i++) {
                             if (currAMCallNum == amCallNumbers[i]) {
-                                ////console.log("there is a match!!!");
                                 radioDisplay(currAMCallNum, signal);
                                 audioPlay(stations.amStations[currAMCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
@@ -1375,67 +1226,46 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 } else {
                     //a preset HAS NOT been selected, start at the first call number
                     ////console.log("a preset HAS NOT been selected");
-                    //////console.log("amCallNum: "+amCallNum);
                     if (amCallNum > 539 && amCallNum < 1601) {
                         audioStop();
                         amCallNum = parseFloat(amCallNum);
                         amCallNum = (amCallNum - 10);
-                        ////console.log("amCallNum: " + amCallNum);
                         for (i = 0; i < amCallNumbers.length; i++) {
                             if (amCallNum == amCallNumbers[i]) {
-                                ////console.log("there is a match!!!");
                                 radioDisplay(amCallNum, signal);
                                 audioPlay(stations.amStations[amCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
-                        ////console.log("amCallNum: " + amCallNum);
                         radioDisplay(amCallNum, signal);
                     }
                 }
             } else {
-                ////console.log("(this works) typeof currFMCallNum: "+typeof currFMCallNum);
-
                 //its in FM mode
                 if (currFMCallNum !== undefined) {
-                    console.log("fmCallNum: " + typeof fmCallNum);
                     //a preset HAS been selected, start at that preset call number
-                    ////console.log("currFMCallNum: " + currFMCallNum);
-                    var tempFMCallNum;
                     if (currFMCallNum > 879 && currFMCallNum < 1081) {
                         audioStop();
                         currFMCallNum = (currFMCallNum - 1);
                         tempFMCallNum = (currFMCallNum * 0.1).toFixed(1);
                         for (i = 0; i < fmCallNumbers.length; i++) {
                             if (currFMCallNum == fmCallNumbers[i]) {
-                                //console.log("currFMCallNum: " + currFMCallNum);
-                                //console.log("tempFMCallNum: " + tempFMCallNum);
-                                //console.log("there is a match!!!");
                                 radioDisplay(currFMCallNum, signal);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             }
                         }
                         radioDisplay(currFMCallNum, signal);
                     }
                 } else {
-                    console.log("fmCallNum: " + typeof fmCallNum);
-                    //a preset HAS NOT been selected, start at the first call number
-                    var tempFMCallNum;
                     if (fmCallNum > 879 && fmCallNum < 1081) {
                         audioStop();
                         fmCallNum -= 1;
-                        //console.log("fmCallNum: " + fmCallNum);
                         for (i = 0; i < fmCallNumbers.length; i++) {
-                            console.log("fmCallNum: " + fmCallNum);
                             if (fmCallNum == fmCallNumbers[i]) {
                                 tempFMCallNum = (fmCallNum * 0.1).toFixed(1);
-                                ////console.log("there is a match!!!");
                                 radioDisplay(fmCallNum, signal);
                                 audioPlay(stations.fmStations[tempFMCallNum]);
-                                ////console.log("audio.src: " + audio.src);
                                 break;
                             } else if (fmCallNum === 880) {
                                 break;
@@ -1487,12 +1317,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     speaker1But.addEventListener("click", function(event) {
         speaker1 = !speaker1;
         mute = !mute;
-            if (speaker1){
-                speaker1But.className = "square-button-down";
-            } else {
-                speaker1But.className = "square-button-up";
-            }
-            eq();
+        if (speaker1) {
+            speaker1But.className = "square-button-down";
+        } else {
+            speaker1But.className = "square-button-up";
+        }
+        eq();
     }, false);
 
     var speaker2But = document.getElementById("speaker2");
@@ -1500,10 +1330,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         speaker2 = !speaker2;
         if (speaker2) {
             speaker2But.className = "square-button-down";
-            //source.connect(context.destination);
         } else {
             speaker2But.className = "square-button-up";
-            //source.disconnect(context.destination);
         }
     }, false);
 
@@ -1512,10 +1340,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         tapeCopy = !tapeCopy;
         if (tapeCopy) {
             tapeCopyBut.className = "square-button-down";
-            //source.connect(context.destination);
         } else {
             tapeCopyBut.className = "square-button-up";
-            //source.disconnect(context.destination);
         }
     }, false);
 
@@ -1524,10 +1350,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         subSonic = !subSonic;
         if (subSonic) {
             subSonicBut.className = "square-button-down";
-            //source.connect(context.destination);
         } else {
             subSonicBut.className = "square-button-up";
-            //source.disconnect(context.destination);
         }
     }, false);
 
@@ -1536,7 +1360,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         loudness = !loudness;
         if (loudness) {
             loudnessBut.className = "square-button-down";
-            
+
         } else {
             loudnessBut.className = "square-button-up";
         }
@@ -1546,8 +1370,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var stereoBut = document.getElementById("audio-mode-button");
     stereoBut.addEventListener("click", function(event) {
         stereo = !stereo;
-        console.log("stereo: "+stereo);
-        if(stereo){
+        if (stereo) {
             stereoBut.className = "square-button-down";
             panner.panningModel = 'HRTF';
         } else {
@@ -1560,7 +1383,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var muteBut = document.getElementById("muting-button");
     muteBut.addEventListener("click", function(event) {
         mute = !mute;
-        if(mute){
+        if (mute) {
             muteBut.className = "square-button-down";
         } else {
             muteBut.className = "square-button-up";
@@ -1572,7 +1395,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* --- down tuner button functionality --*/
     var memoryButton = document.getElementById("memory-button");
     memoryButton.addEventListener("click", function(event) {
-        if(power){
+        if (power) {
             memory = !memory;
             if (memory) {
                 document.getElementById("memory-button").className = "glass-button-on";
@@ -1652,7 +1475,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 radioDisplay(fmCallNum, signal);
                 audioPlay(fmUrl);
             }
-            ////console.log("power: " + power);
             powerOnDisplay();
             gainNode.gain.value = volume;
             document.getElementById("power-button").className = "vertical-button-on";
@@ -1667,7 +1489,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     // pan function for balance dial
     function pan(range) {
-        var xDeg = parseInt(range,10);
+        var xDeg = parseInt(range, 10);
         var zDeg = xDeg + 280;
         if (zDeg > 280) {
             zDeg = 540 - zDeg;
@@ -1675,10 +1497,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         var x = Math.sin(xDeg * (Math.PI / 540));
         var z = Math.sin(zDeg * (Math.PI / 540));
         panner.setPosition(x, 0, z);
-        console.log("range: "+range);
-        console.log("xDeg: "+xDeg);
-        console.log("x: "+x);
-        console.log("z: "+z);
     }
 
     var balanceDial = JogDial(document.getElementById('balance-knob'), {
@@ -1690,10 +1508,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
-    }).on("mousemove", function(event){
-        var balance =  Math.round(event.target.rotation);
+    }).on("mousemove", function(event) {
+        var balance = Math.round(event.target.rotation);
         pan(balance);
-        console.log("balance1: "+balance);
     });
 
     var bassDial = JogDial(document.getElementById('bass-knob'), {
@@ -1705,12 +1522,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
-    }).on("mousemove", function(event){
+    }).on("mousemove", function(event) {
         var bass = currBassFiltGain + (event.target.rotation + 140) / 280 * 10;
-        if(!toneDefeat){
+        if (!toneDefeat) {
             bassFilter.gain.value = bass;
         }
-        //document.getElementById("bassFilterGainStatus").innerHTML = "bassFilter.gain.value: "+bassFilter.gain.value;      
     });
 
     var trebleDial = JogDial(document.getElementById('treble-knob'), {
@@ -1722,12 +1538,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
-    }).on("mousemove", function(event){
+    }).on("mousemove", function(event) {
         var treble = currTrebFiltGain + (event.target.rotation + 140) / 280 * 10;
-        if(!toneDefeat){
+        if (!toneDefeat) {
             trebFilter.gain.value = treble;
         }
-        //document.getElementById("trebFilterGainStatus").innerHTML = "trebNode.gain.value: "+trebFilter.gain.value;      
     });
 
     var volumeDial = JogDial(document.getElementById('volume-knob'), {
@@ -1739,11 +1554,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
         minDegree: -140,
         maxDegree: 140,
         degreeStartAt: 0
-    }).on("mousemove", function(event){
+    }).on("mousemove", function(event) {
         var volume = (event.target.rotation + 140) / 280;
         gainNode.gain.value = volume;
-        //document.getElementById("gainNodeStatus").innerHTML = "gainNode.gain.value: "+gainNode.gain.value;      
-    }).on("mouseup", function(event){
+    }).on("mouseup", function(event) {
         currVolume = volume;
     });
 
