@@ -1824,3 +1824,9 @@ body {
   text-align: center;
   font-family: 'Roboto', sans-serif;
 }
+#footer a {
+  color: #323D32;
+}
+.img {
+  border: 1px solid #100600;
+}

@@ -1603,21 +1603,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }, false);
 
     document.getElementById("speaker2").addEventListener("mouseover", function() {
-        status.innerHTML = "<font color='#FF0000'>Speaker 2: This function is not applicable in this web app.</font>";
+        status.innerHTML = "Speaker 2: <font color='#FEC436'>This function is not applicable in this web app.</font>";
     }, false);
     document.getElementById("speaker2").addEventListener("mouseout", function() {
         status.innerHTML = "";
     }, false);
 
     document.getElementById("tape-copy-button").addEventListener("mouseover", function() {
-        status.innerHTML = "<font color='#FF0000'>Tape Copy: This function is not applicable in this web app.</font>";
+        status.innerHTML = "Tape Copy: <font color='#FEC436'>This function is not applicable in this web app.</font>";
     }, false);
     document.getElementById("tape-copy-button").addEventListener("mouseout", function() {
         status.innerHTML = "";
     }, false);
 
     document.getElementById("subsonic-filter-button").addEventListener("mouseover", function() {
-        status.innerHTML = "<font color='#FF0000'>Subsonic Filter: This function is not applicable in this web app.</font>";
+        status.innerHTML = "Subsonic Filter: <font color='#FEC436'>This function is not applicable in this web app.</font>";
     }, false);
     document.getElementById("subsonic-filter-button").addEventListener("mouseout", function() {
         status.innerHTML = "";
@@ -1689,7 +1689,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function presetOver(i) {
         "use strict";
         return function () {
-                status.innerHTML = "Preset Memory Button: Press any one of the eight PRESET MEMORY buttons while the MEMORY button is illuminated in green, and the frequency indicated by the STATION DISPLAY is memorized.";
+                status.innerHTML = "Preset Memory Button: Press any one of the eight PRESET MEMORY buttons while the MEMORY button is illuminated in green, and the frequency indicated by the STATION DISPLAY is memorized.<br><font color='#FEC436'>NOTE: Some internet stations only broadcast between certain hours an may appear not to play.<br>Also, depending on internet traffic some stations may take a moment to begin playing.</font>";
         };
     }
 
@@ -1721,28 +1721,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }, false);
 
     document.getElementById("func-2").addEventListener("mouseover", function() {
-        status.innerHTML = "AUX/CD Function Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+        status.innerHTML = "AUX/CD Function Selector: <font color='#FEC436'>This function is not applicable in this application.</font>";
     }, false);
     document.getElementById("func-2").addEventListener("mouseout", function() {
         status.innerHTML = "";
     }, false);
 
     document.getElementById("func-1").addEventListener("mouseover", function() {
-        status.innerHTML = "Phono Function Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+        status.innerHTML = "Phono Function Selector: <font color='#FEC436'>This function is not applicable in this application.</font>";
     }, false);
     document.getElementById("func-1").addEventListener("mouseout", function() {
         status.innerHTML = "";
     }, false);
 
     document.getElementById("tm-1").addEventListener("mouseover", function() {
-        status.innerHTML = "Tape 1 Monitor Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+        status.innerHTML = "Tape 1 Monitor Selector: <font color='#FEC436'>This function is not applicable in this application.</font>";
     }, false);
     document.getElementById("tm-1").addEventListener("mouseout", function() {
         status.innerHTML = "";
     }, false);
 
     document.getElementById("tm-2").addEventListener("mouseover", function() {
-        status.innerHTML = "Tape 2 Monitor Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+        status.innerHTML = "Tape 2 Monitor Selector: <font color='#FEC436'>This function is not applicable in this application.</font>";
     }, false);
     document.getElementById("tm-2").addEventListener("mouseout", function() {
         status.innerHTML = "";
