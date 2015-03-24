@@ -10,8 +10,6 @@ Replicating the functionality of the 1982 <b>Harman Kardon hk 590i</b> radio rec
 <p>What exactly did I do here?</p>
 <p>I reverse engineered my own 1982 Harman Kardon 590i receiver as a Google Chrome experiment, utilizing technologies like <i><b>Less, JavaScript, HTML5, Google Web Fonts, streaming audio</b></i>, and the <i><b>JavaScript Web Audio API</b></i> to replicate the real-life receiver's functionality.</p>
 
-<img src="img/hk-590i.png" alt="image of interface">
-
 <p>The interface is constructed almost entirely in CSS and HTML5, and matched as closely as possible to the real thing. A very small css sprite image was used to create the digital font in the electronic display. Go ahead, have a look at the source code!<br>
 </p>
 
