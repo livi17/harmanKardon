@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     var tempFMCallNum;
 
+    var status = document.getElementById("status-text");
+
     var audio = document.getElementById('audio');
     var digit1 = document.getElementById('digit1');
     var digit2 = document.getElementById('digit2');
@@ -92,7 +94,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         fmStations: {
             '88.1': 'http://indie.streamon.fm:8000/indie-48k.aac',
             '88.6': 'http://listen.radionomy.com/frequence-terre',
-            '92.5': 'http://sc3.spacialnet.com:30430',
+            '89.1': 'http://listen.radionomy.com/PortofinoNetwork',
+            '89.5': 'http://streaming.radionomy.com/ClassicHits931WNOX',
+            '92.5': 'http://50.117.26.26:6959/Live',
             '93.1': 'http://live.leanstream.co/CHAYFM-MP3',
             '93.9': 'http://listen.radionomy.com/indie-rock-radio.m3u',
             '94.1': 'http://8653.live.streamtheworld.com/CBC_R2_IET_H_SC',
@@ -1345,7 +1349,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }, false);
 
-    var subSonicBut = document.getElementById("supsonic-filter-button");
+    var subSonicBut = document.getElementById("subsonic-filter-button");
     subSonicBut.addEventListener("click", function(event) {
         subSonic = !subSonic;
         if (subSonic) {
@@ -1560,5 +1564,217 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }).on("mouseup", function(event) {
         currVolume = volume;
     });
+
+    // tooltip messages
+
+    document.getElementById("power-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Power Swtche: Pressing this switch will turn on the power and the front panel will illuminate. Press the switch again to turn the power off";
+    }, false);
+    document.getElementById("power-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("bass-turnover-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Bass Turnover: This feature alters the range of adjustment provided by the bass control. The user can more precisely contour the tone controls to match their speaker system and room acoustics.";
+    }, false);
+    document.getElementById("bass-turnover-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("tone-defeat-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Tone Defeat: The tone defeat switch provides the ability to bypass the bass and treble circuitry. This assures flat frequency response and also simplifies the audio signal path, providing the best possible sound quality.";
+    }, false);
+    document.getElementById("tone-defeat-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("treble-turnover-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Treble Turnover: This feature alters the range of adjustment provided by the treble control. The user can more precisely contour the tone controls to match their speaker system and room acoustics.";
+    }, false);
+    document.getElementById("bass-turnover-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("speaker1").addEventListener("mouseover", function() {
+        status.innerHTML = "One or two speaker systems can be conected to this unit. Depress the selector switch (1 or 2) corresponding to which system you want to listen to. (Currently only selector 1 works with this app)";
+    }, false);
+    document.getElementById("speaker1").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("speaker2").addEventListener("mouseover", function() {
+        status.innerHTML = "<font color='#FF0000'>Speaker 2: This function is not applicable in this web app.</font>";
+    }, false);
+    document.getElementById("speaker2").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("tape-copy-button").addEventListener("mouseover", function() {
+        status.innerHTML = "<font color='#FF0000'>Tape Copy: This function is not applicable in this web app.</font>";
+    }, false);
+    document.getElementById("tape-copy-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("subsonic-filter-button").addEventListener("mouseover", function() {
+        status.innerHTML = "<font color='#FF0000'>Subsonic Filter: This function is not applicable in this web app.</font>";
+    }, false);
+    document.getElementById("subsonic-filter-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("loudness-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Loudness: When listening at a low level, the loudness switch will create<br> a more natural sound by emphasizing the low and high frequency ranges.";
+    }, false);
+    document.getElementById("loudness-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("audio-mode-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Audio Mode: This selector is used to combine the left and right channel music signals. Usually it is set in the stereo position. If the FM stereo broadcast station you are listening to is weak, set this mono.";
+    }, false);
+    document.getElementById("audio-mode-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("muting-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Muting: This switch eliminates irritating interstation noise when scanning for a station.";
+    }, false);
+    document.getElementById("muting-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("down-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Tuning Buttons: These buttons are used for tuning to the desired broadcast station.<br>When this button is pressed, the frequency will change to a lower frequency.";
+    }, false);
+    document.getElementById("down-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("up-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Tuning Buttons: These buttons are used for tuning to the desired broadcast station.<br>When this button is pressed, the frequency will change to a higher frequency.";
+    }, false);
+    document.getElementById("up-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("auto-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Auto Tuning Mode: When this button is illuminated, the unit will scan<br>up or down to the next station automatically.";
+    }, false);
+    document.getElementById("auto-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("manual-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Manual Tuning Mode: When this button is illuminated, the unit will scan<br>up or down to the next station in small steps incrementally.";
+    }, false);
+    document.getElementById("manual-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("memory-button").addEventListener("mouseover", function() {
+        status.innerHTML = "Memory Button: This button is used to enter or change the preset broadcast stations. When this switch is pressed, it will illuminate in green for 5 seconds. This indicates the preset memory standby state.";
+    }, false);
+    document.getElementById("memory-button").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("volume-knob").addEventListener("mouseover", function() {
+        status.innerHTML = "Volume Control Knob: This knob controls the sound level. Turning clockwise increases<br>the sound volume, and turning counterclockwise decreases it.";
+    }, false);
+    document.getElementById("volume-knob").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    function presetOver(i) {
+        "use strict";
+        return function () {
+                status.innerHTML = "Preset Memory Button: Press any one of the eight PRESET MEMORY buttons while the MEMORY button is illuminated in green, and the frequency indicated by the STATION DISPLAY is memorized.";
+        };
+    }
+
+    function presetOut(i) {
+        "use strict";
+        return function () {
+                status.innerHTML = "";
+        };
+    }
+
+    for (i = 1; i < 9; i++) {
+        var presetEle = document.getElementById("preset" + i);
+        presetEle.addEventListener("mouseover", presetOver(i));
+        presetEle.addEventListener("mouseout", presetOut(i));
+    }
+
+    document.getElementById("func-4").addEventListener("mouseover", function() {
+        status.innerHTML = "FM Function Selector: Press this switch to listen to an FM broadcast";
+    }, false);
+    document.getElementById("func-4").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("func-3").addEventListener("mouseover", function() {
+        status.innerHTML = "AM Function Selector: Press this switch to listen to an AM broadcast";
+    }, false);
+    document.getElementById("func-3").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("func-2").addEventListener("mouseover", function() {
+        status.innerHTML = "AUX/CD Function Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+    }, false);
+    document.getElementById("func-2").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("func-1").addEventListener("mouseover", function() {
+        status.innerHTML = "Phono Function Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+    }, false);
+    document.getElementById("func-1").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("tm-1").addEventListener("mouseover", function() {
+        status.innerHTML = "Tape 1 Monitor Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+    }, false);
+    document.getElementById("tm-1").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("tm-2").addEventListener("mouseover", function() {
+        status.innerHTML = "Tape 2 Monitor Selector: <font color='FF0000'>This function is not applicable in this application.</font>";
+    }, false);
+    document.getElementById("tm-2").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("tm-3").addEventListener("mouseover", function() {
+        status.innerHTML = "Source Monitor Selector: Press this to listen to a program source other than a tape.";
+    }, false);
+    document.getElementById("tm-3").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("balance-knob").addEventListener("mouseover", function() {
+        status.innerHTML = "Balance Control Knob: This knob is used to balance the left and right channels. Usually it is set to the center. Turn it to the left or right if it seems unbalanced from the speakers or headphones.";
+    }, false);
+    document.getElementById("balance-knob").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("treble-knob").addEventListener("mouseover", function() {
+        status.innerHTML = "Treble Control Knob: This knob controls the high frequency sound level. Turn it clockwise to boost, or counterclockwise to reduce the high frequency level.";
+    }, false);
+    document.getElementById("treble-knob").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
+    document.getElementById("bass-knob").addEventListener("mouseover", function() {
+        status.innerHTML = "Bass Control Knob: This knob controls the low frequency sound level. Turn it clockwise to boost, or counterclockwise to reduce the low frequency level.";
+    }, false);
+    document.getElementById("bass-knob").addEventListener("mouseout", function() {
+        status.innerHTML = "";
+    }, false);
+
 
 }); // end of DOMContentLoaded
