@@ -1776,7 +1776,7 @@ body {
 }
 #main-text {
   width: 920px;
-  margin: 30px auto;
+  margin: 10px auto;
 }
 #main-text strong {
   font-family: 'Roboto', sans-serif;
@@ -1817,7 +1817,7 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   color: #000000;
-  font-size: 1.52em;
+  font-size: 1.50em;
   letter-spacing: 0.02em;
 }
 #footer {
